@@ -22,3 +22,10 @@ export type Lead = {
   source: 'instagram' | 'whatsapp' | 'telegram';
   stage: 'queue' | 'hold' | 'trial' | 'awaiting_payment' | 'paid' | 'canceled';
 };
+
+export type Task = {
+  id: string;
+  title: string;
+  completed: boolean;
+  payment_id: string | null;
+};
