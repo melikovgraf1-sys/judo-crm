@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink, useNavigate } from "react-router-dom";
 import { Menu, X, Users, Settings, LayoutDashboard, Group } from "lucide-react";
+import Link from "next/link";
+import ClientsPage from "../../pages/clients";
 
 /*
   How to use in your project
@@ -279,162 +281,6 @@ function GroupsPage() {
   );
 }
 
-function ClientsPage() {
-  // Минимальная страница: добавление клиента + список, с предзаполнением по ?group
-  const [params] = (window as any).useSearchParamsHook?.() ?? [] as any; // fallback для среды без хука в рантайме канваса
-  // В реальном коде заменить строку выше на:  
-  //   const [params] = useSearchParams();
-
-  const prefillGroup = typeof URLSearchParams !== 'undefined' ? new URLSearchParams(window.location.search).get('group') ?? '' : '';
-
-  const [form, setForm] = useState({ name: "", phone: "", group: prefillGroup });
-  const [items, setItems] = useState<{ id: number; name: string; phone: string; group?: string }[]>([]);
-
-  function addClient(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.name.trim() || !form.phone.trim()) return;
-    const next = { id: Date.now(), name: form.name.trim(), phone: form.phone.trim(), group: form.group || undefined };
-    setItems((prev) => [next, ...prev]);
-    setForm({ name: "", phone: "", group: form.group });
-  }
-
-  return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Клиенты</h1>
-
-      <form onSubmit={addClient} className="rounded-2xl border bg-white p-4 grid sm:grid-cols-4 gap-3">
-        <input
-          className="px-3 py-2 rounded-xl border"
-          placeholder="Имя и фамилия"
-          value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-        />
-        <input
-          className="px-3 py-2 rounded-xl border"
-          placeholder="Телефон"
-          value={form.phone}
-          onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-        />
-        <input
-          className="px-3 py-2 rounded-xl border"
-          placeholder="ID группы (опционально)"
-          value={form.group}
-          onChange={(e) => setForm((f) => ({ ...f, group: e.target.value }))}
-        />
-        <button className="px-3 py-2 rounded-xl bg-gray-900 text-white">Добавить</button>
-      </form>
-
-      <div className="rounded-2xl border bg-white overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 text-gray-500">
-              <th className="text-left p-3">#</th>
-              <th className="text-left p-3">Имя</th>
-              <th className="text-left p-3">Телефон</th>
-              <th className="text-left p-3">Группа</th>
-              <th className="text-left p-3">Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.length === 0 && (
-              <tr>
-                <td className="p-3 text-gray-500" colSpan={5}>клиентов пока нет</td>
-              </tr>
-            )}
-            {items.map((c) => (
-              <tr key={c.id} className="border-t">
-                <td className="p-3">{c.id}</td>
-                <td className="p-3">{c.name}</td>
-                <td className="p-3">{c.phone}</td>
-                <td className="p-3">{c.group ?? "—"}</td>
-                <td className="p-3">
-                  <div className="flex gap-2">
-                    <button className="px-2 py-1 rounded-lg border" onClick={() => alert("Открыть карточку клиента")}>Открыть</button>
-                    <button className="px-2 py-1 rounded-lg border" onClick={() => setItems((prev) => prev.filter((x) => x.id !== c.id))}>Удалить</button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  );
-}
-
-function SettingsPage() {() {
-  // Minimal stub: list + quick add form
-  const [form, setForm] = useState({ name: "", phone: "", group: "" });
-  const [items, setItems] = useState<{ id: number; name: string; phone: string; group?: string }[]>([
-    { id: 1, name: "Иван П.", phone: "+90 555 123 45 67", group: "1" },
-  ]);
-
-  function addClient(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.name.trim() || !form.phone.trim()) return;
-    const next = { id: Date.now(), name: form.name.trim(), phone: form.phone.trim(), group: form.group || undefined };
-    setItems((prev) => [next, ...prev]);
-    setForm({ name: "", phone: "", group: form.group });
-  }
-
-  return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Клиенты</h1>
-
-      <form onSubmit={addClient} className="rounded-2xl border bg-white p-4 grid sm:grid-cols-4 gap-3">
-        <input
-          className="px-3 py-2 rounded-xl border"
-          placeholder="Имя и фамилия"
-          value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-        />
-        <input
-          className="px-3 py-2 rounded-xl border"
-          placeholder="Телефон"
-          value={form.phone}
-          onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-        />
-        <input
-          className="px-3 py-2 rounded-xl border"
-          placeholder="ID группы (опционально)"
-          value={form.group}
-          onChange={(e) => setForm((f) => ({ ...f, group: e.target.value }))}
-        />
-        <button className="px-3 py-2 rounded-xl bg-gray-900 text-white">Добавить</button>
-      </form>
-
-      <div className="rounded-2xl border bg-white overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 text-gray-500">
-              <th className="text-left p-3">#</th>
-              <th className="text-left p-3">Имя</th>
-              <th className="text-left p-3">Телефон</th>
-              <th className="text-left p-3">Группа</th>
-              <th className="text-left p-3">Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((c) => (
-              <tr key={c.id} className="border-t">
-                <td className="p-3">{c.id}</td>
-                <td className="p-3">{c.name}</td>
-                <td className="p-3">{c.phone}</td>
-                <td className="p-3">{c.group ?? "—"}</td>
-                <td className="p-3">
-                  <div className="flex gap-2">
-                    <button className="px-2 py-1 rounded-lg border" onClick={() => alert("Открыть карточку клиента")}>Открыть</button>
-                    <button className="px-2 py-1 rounded-lg border" onClick={() => confirm("Удалить клиента?") && setItems((prev) => prev.filter((x) => x.id !== c.id))}>Удалить</button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  );
-}
 
 function SettingsPage() {
   return (
@@ -470,7 +316,9 @@ function NotFoundPage() {
       <h1 className="text-2xl font-semibold mb-2">Страница не найдена</h1>
       <p className="text-gray-600">Проверь адрес или вернись на главную.</p>
       <div className="mt-6">
-        <a href="/" className="px-3 py-2 rounded-xl border">На главную</a>
+        <Link href="/" className="px-3 py-2 rounded-xl border">
+          На главную
+        </Link>
       </div>
     </section>
   );
