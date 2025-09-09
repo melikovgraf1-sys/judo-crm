@@ -13,3 +13,12 @@ export type Client = {
   payment_method: 'cash' | 'transfer' | null;
   district: string | null;
 };
+
+export type Lead = {
+  id: string;
+  created_at: string;
+  name: string;
+  phone: string | null;
+  source: 'instagram' | 'whatsapp' | 'telegram';
+  stage: 'queue' | 'hold' | 'trial' | 'awaiting_payment' | 'paid' | 'canceled';
+};
