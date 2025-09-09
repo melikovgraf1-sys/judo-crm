@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import type { Lead, LeadStage, LeadSource } from '../lib/types';
-import { LEAD_STAGES } from '../lib/types';
+import { LEAD_STAGES, LEAD_STAGE_TITLES } from '../lib/types';
 import LeadCard from '../components/LeadCard';
 import LeadForm from '../components/LeadForm';
 
@@ -15,7 +15,11 @@ export default function LeadsPage() {
       .from('leads')
       .select('id, created_at, name, phone, source, stage')
       .order('created_at', { ascending: false });
-    if (!error && data) setLeads(data as Lead[]);
+    if (error) {
+      console.error(error);
+    } else if (data) {
+      setLeads(data as Lead[]);
+    }
     setLoading(false);
   }
 
@@ -26,13 +30,24 @@ export default function LeadsPage() {
     phone: string | null;
     source: LeadSource;
   }) {
-    await supabase.from('leads').insert({ ...data, stage: 'queue' });
+    const { error } = await supabase.from('leads').insert({ ...data, stage: 'queue' });
+    if (error) {
+      console.error(error);
+      return;
+    }
     await loadData();
   }
 
   async function changeStage(id: string, stage: LeadStage) {
     setLeads((ls) => ls.map((l) => (l.id === id ? { ...l, stage } : l)));
-    await supabase.from('leads').update({ stage }).eq('id', id);
+    const { error } = await supabase
+      .from('leads')
+      .update({ stage })
+      .eq('id', id);
+    if (error) {
+      console.error(error);
+      await loadData();
+    }
   }
 
   return (
@@ -43,7 +58,9 @@ export default function LeadsPage() {
       <div className="flex gap-4 overflow-x-auto">
         {LEAD_STAGES.map((stage) => (
           <div key={stage.key} className="w-64 shrink-0">
-            <h2 className="text-center font-semibold mb-2">{stage.title}</h2>
+            <h2 className="text-center font-semibold mb-2">
+              {LEAD_STAGE_TITLES[stage.key]}
+            </h2>
             {leads.filter((l) => l.stage === stage.key).map((l) => (
               <LeadCard key={l.id} lead={l} onStageChange={changeStage} />
             ))}

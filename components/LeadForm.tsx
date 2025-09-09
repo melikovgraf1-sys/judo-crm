@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LEAD_SOURCES } from '../lib/types';
+import { LEAD_SOURCES, LEAD_SOURCE_TITLES } from '../lib/types';
 import type { LeadSource } from '../lib/types';
 
 export default function LeadForm({
@@ -41,7 +41,7 @@ export default function LeadForm({
       >
         {LEAD_SOURCES.map((s) => (
           <option key={s} value={s}>
-            {s}
+            {LEAD_SOURCE_TITLES[s]}
           </option>
         ))}
       </select>

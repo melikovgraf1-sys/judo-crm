@@ -1,5 +1,5 @@
 import type { Lead, LeadStage } from '../lib/types';
-import { LEAD_STAGES } from '../lib/types';
+import { LEAD_STAGES, LEAD_SOURCE_TITLES } from '../lib/types';
 
 export default function LeadCard({
   lead,
@@ -25,7 +25,9 @@ export default function LeadCard({
           </option>
         ))}
       </select>
-      <div className="text-xs text-gray-400 mt-1">{lead.source}</div>
+      <div className="text-xs text-gray-400 mt-1">
+        {LEAD_SOURCE_TITLES[lead.source]}
+      </div>
     </div>
   );
 }
