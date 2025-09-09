@@ -15,7 +15,8 @@ export default function ClientModal({
 
   useEffect(() => { setForm(initial ?? {}); }, [initial]);
 
-  const set = (k: keyof Client, v: any) => setForm(s => ({ ...s, [k]: v }));
+  const set = (k: keyof Client, v: Client[keyof Client]) =>
+    setForm((s) => ({ ...s, [k]: v }));
 
   const save = async () => {
     // валидация минимальная
