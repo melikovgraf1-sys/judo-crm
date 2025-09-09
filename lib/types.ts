@@ -38,8 +38,9 @@ export const LEAD_STAGE_TITLES: Record<LeadStage, string> = Object.fromEntries(
 ) as Record<LeadStage, string>;
 
 export type Lead = {
-  id: string;
+  id: number;
   created_at: string;
+  updated_at?: string | null;
   name: string;
   phone: string | null;
   source: LeadSource;
