@@ -15,7 +15,7 @@ export type Client = {
 };
 
 export const LEAD_SOURCES = ['instagram', 'whatsapp', 'telegram'] as const;
-export type LeadSource = typeof LEAD_SOURCES[number];
+export type LeadSource = (typeof LEAD_SOURCES)[number];
 
 export const LEAD_SOURCE_TITLES: Record<LeadSource, string> = {
   instagram: 'Instagram',
@@ -31,7 +31,7 @@ export const LEAD_STAGES = [
   { key: 'paid', title: 'Оплачено' },
   { key: 'canceled', title: 'Отмена' },
 ] as const;
-export type LeadStage = typeof LEAD_STAGES[number]['key'];
+export type LeadStage = (typeof LEAD_STAGES)[number]['key'];
 
 export const LEAD_STAGE_TITLES: Record<LeadStage, string> = Object.fromEntries(
   LEAD_STAGES.map((s) => [s.key, s.title])
