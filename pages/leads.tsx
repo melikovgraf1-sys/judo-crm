@@ -38,21 +38,15 @@ export default function LeadsPage() {
     }
 
     const grouped: StageMap = JSON.parse(JSON.stringify(EMPTY));
-    for (const lead of (data as Lead[])) {
+    for (const lead of data as Lead[]) {
       grouped[lead.stage].push(lead);
     }
     setLeads(grouped);
     setLoading(false);
   }
 
-  async function addLead(data: {
-    name: string;
-    phone: string | null;
-    source: LeadSource;
-  }) {
-    const { error } = await supabase
-      .from('leads')
-      .insert({ ...data, stage: 'queue' });
+  async function addLead(data: { name: string; phone: string | null; source: LeadSource }) {
+    const { error } = await supabase.from('leads').insert({ ...data, stage: 'queue' });
     if (error) {
       console.error(error);
       return;
@@ -74,10 +68,7 @@ export default function LeadsPage() {
       return updated;
     });
 
-    const { error } = await supabase
-      .from('leads')
-      .update({ stage })
-      .eq('id', id);
+    const { error } = await supabase.from('leads').update({ stage }).eq('id', id);
     if (error) {
       console.error(error);
       setLeads(previous);
@@ -92,9 +83,7 @@ export default function LeadsPage() {
       <div className="flex gap-4 overflow-x-auto">
         {LEAD_STAGES.map((stage) => (
           <div key={stage.key} className="w-64 shrink-0">
-            <h2 className="text-center font-semibold mb-2">
-              {LEAD_STAGE_TITLES[stage.key]}
-            </h2>
+            <h2 className="text-center font-semibold mb-2">{LEAD_STAGE_TITLES[stage.key]}</h2>
             {leads[stage.key].map((l) => (
               <LeadCard key={l.id} lead={l} onStageChange={changeStage} />
             ))}
