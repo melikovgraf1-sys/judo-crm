@@ -13,3 +13,25 @@ export type Client = {
   payment_method: 'cash' | 'transfer' | null;
   district: string | null;
 };
+
+export const LEAD_SOURCES = ['instagram', 'whatsapp', 'telegram'] as const;
+export type LeadSource = typeof LEAD_SOURCES[number];
+
+export const LEAD_STAGES = [
+  { key: 'queue', title: 'Очередь' },
+  { key: 'hold', title: 'Задержка' },
+  { key: 'trial', title: 'Пробное' },
+  { key: 'awaiting_payment', title: 'Ожидание оплаты' },
+  { key: 'paid', title: 'Оплачено' },
+  { key: 'canceled', title: 'Отмена' },
+] as const;
+export type LeadStage = typeof LEAD_STAGES[number]['key'];
+
+export type Lead = {
+  id: string;
+  created_at: string;
+  name: string;
+  phone: string | null;
+  source: LeadSource;
+  stage: LeadStage;
+};

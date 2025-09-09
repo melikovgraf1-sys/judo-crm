@@ -1,8 +1,55 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import type { Lead, LeadStage, LeadSource } from '../lib/types';
+import { LEAD_STAGES } from '../lib/types';
+import LeadCard from '../components/LeadCard';
+import LeadForm from '../components/LeadForm';
+
 export default function LeadsPage() {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function loadData() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('leads')
+      .select('id, created_at, name, phone, source, stage')
+      .order('created_at', { ascending: false });
+    if (!error && data) setLeads(data as Lead[]);
+    setLoading(false);
+  }
+
+  useEffect(() => { loadData(); }, []);
+
+  async function addLead(data: {
+    name: string;
+    phone: string | null;
+    source: LeadSource;
+  }) {
+    await supabase.from('leads').insert({ ...data, stage: 'queue' });
+    await loadData();
+  }
+
+  async function changeStage(id: string, stage: LeadStage) {
+    setLeads((ls) => ls.map((l) => (l.id === id ? { ...l, stage } : l)));
+    await supabase.from('leads').update({ stage }).eq('id', id);
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Leads</h1>
-      <p className="text-gray-600">Тут сделаем воронку (Queue → Trial → Awaiting payment → Paid), и конвертацию в клиента.</p>
+      <LeadForm onAdd={addLead} />
+      {loading && <div className="text-gray-500">loading…</div>}
+      <div className="flex gap-4 overflow-x-auto">
+        {LEAD_STAGES.map((stage) => (
+          <div key={stage.key} className="w-64 shrink-0">
+            <h2 className="text-center font-semibold mb-2">{stage.title}</h2>
+            {leads.filter((l) => l.stage === stage.key).map((l) => (
+              <LeadCard key={l.id} lead={l} onStageChange={changeStage} />
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
