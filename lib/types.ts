@@ -22,3 +22,10 @@ export type Lead = {
   source: 'instagram' | 'whatsapp' | 'telegram';
   stage: 'queue' | 'hold' | 'trial' | 'awaiting_payment' | 'paid' | 'canceled';
 };
+
+export type AttendanceRecord = {
+  id: string;
+  client_id: string;
+  date: string;
+  present: boolean;
+};
