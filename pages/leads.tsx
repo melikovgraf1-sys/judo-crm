@@ -22,6 +22,7 @@ export default function LeadsPage() {
     loadData();
   }, []);
 
+
   async function loadData() {
     setLoading(true);
     const { data, error } = await supabase
