@@ -78,7 +78,7 @@ export type Lead = {
   phone: string | null;
   source: LeadSource;
   stage: LeadStage;
-  birth_date: string | null;
-  district: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
-  group_id: string | null;
+  birth_date?: string | null;
+  district?: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
+  group_id?: string | null;
 };
