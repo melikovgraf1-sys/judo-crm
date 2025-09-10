@@ -11,7 +11,7 @@ export type Client = {
   gender: 'm' | 'f' | null;
   payment_status: 'pending' | 'active' | 'debt' | null;
   payment_method: 'cash' | 'transfer' | null;
-  district: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
+  district: string | null;
 };
 
 export type AttendanceRecord = {
@@ -65,4 +65,7 @@ export type Lead = {
   phone: string | null;
   source: LeadSource;
   stage: LeadStage;
+  birth_date: string | null;
+  district: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
+  group_id: string | null;
 };
