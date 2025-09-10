@@ -63,7 +63,7 @@ export default function ClientModal({
         .update(basePayload)
         .eq('id', initial.id));
     } else {
-      ({ data, error } = await supabase.from('clients').insert(payload).select().single());
+      ({ data, error } = await supabase.from('clients').insert(basePayload).select().single());
       if (!error && groupId && data) {
         const { error: cgError } = await supabase
           .from('client_groups')
