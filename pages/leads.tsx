@@ -79,13 +79,23 @@ export default function LeadsPage() {
     phone: string | null;
     source: LeadSource;
   }) {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('leads')
-      .insert({ name, phone, source, stage: 'queue' });
+      .insert({ name, phone, source, stage: 'queue' })
+      .select(
+        'id, created_at, name, phone, source, stage, birth_date, district, group_id'
+      )
+      .single();
     if (error) {
       console.error(error);
-      return;
+    } else if (data) {
+      setLeads((prev) => ({
+        ...prev,
+        queue: [data as Lead, ...prev.queue],
+      }));
     }
+
+    // Refresh leads to ensure UI stays in sync even if the inserted row isn't returned
     await loadData();
   }
 
