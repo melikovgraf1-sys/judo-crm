@@ -65,28 +65,32 @@ export default function ClientModal({
             <option value="telegram">Telegram</option>
             <option value="instagram">Instagram</option>
           </select>
-          <input
-            type="date"
-            className="border rounded p-2 col-span-1"
-            placeholder="Дата рождения"
-            aria-label="Дата рождения"
-            value={form.birth_date ?? ''}
-            onChange={e => set('birth_date', e.target.value)}
-          />
+          <label className="col-span-1 flex flex-col">
+            <span className="text-sm text-gray-700">Дата рождения</span>
+            <input
+              type="date"
+              className="border rounded p-2"
+              aria-label="Дата рождения"
+              value={form.birth_date ?? ''}
+              onChange={e => set('birth_date', e.target.value)}
+            />
+          </label>
           <input
             className="border rounded p-2 col-span-1"
             placeholder="Родитель"
             value={form.parent_name ?? ''}
             onChange={e => set('parent_name', e.target.value)}
           />
-          <input
-            type="date"
-            className="border rounded p-2 col-span-1"
-            placeholder="Начало посещения"
-            aria-label="Начало посещения"
-            value={form.start_date ?? ''}
-            onChange={e => set('start_date', e.target.value)}
-          />
+          <label className="col-span-1 flex flex-col">
+            <span className="text-sm text-gray-700">Начало посещения</span>
+            <input
+              type="date"
+              className="border rounded p-2"
+              aria-label="Начало посещения"
+              value={form.start_date ?? ''}
+              onChange={e => set('start_date', e.target.value)}
+            />
+          </label>
           <select className="border rounded p-2 col-span-1" value={form.gender ?? ''} onChange={e => set('gender', e.target.value || null)}>
             <option value="">Пол</option>
             <option value="m">М</option>
