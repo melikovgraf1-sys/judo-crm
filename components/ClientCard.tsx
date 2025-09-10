@@ -23,8 +23,8 @@ export default function ClientCard({
           </div>
         </div>
         <div className="flex gap-2">
-          <button className="px-3 py-1 rounded bg-blue-600 text-white" onClick={() => onEdit(client)}>Edit</button>
-          <button className="px-3 py-1 rounded bg-red-600 text-white" onClick={() => onDelete(client.id)}>Delete</button>
+          <button className="px-3 py-1 rounded bg-blue-600 text-white" onClick={() => onEdit(client)}>Редактировать</button>
+          <button className="px-3 py-1 rounded bg-red-600 text-white" onClick={() => onDelete(client.id)}>Удалить</button>
         </div>
       </div>
       {children && <div className="mt-3">{children}</div>}

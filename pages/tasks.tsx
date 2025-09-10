@@ -48,20 +48,20 @@ export default function TasksPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Tasks</h1>
+      <h1 className="text-2xl font-bold mb-4">Задачи</h1>
       <div className="flex gap-2 mb-4">
         <input
           type="text"
           className="border px-2 py-1 rounded flex-1"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="New task..."
+          placeholder="Новая задача..."
         />
         <button
           onClick={addTask}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          + Add Task
+          + Добавить задачу
         </button>
       </div>
       <ul className="space-y-2">
@@ -79,7 +79,7 @@ export default function TasksPage() {
           </li>
         ))}
         {tasks.length === 0 && (
-          <div className="text-gray-500">no tasks yet</div>
+          <div className="text-gray-500">Задач пока нет</div>
         )}
       </ul>
     </div>

@@ -41,7 +41,7 @@ export default function LeadModal({
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-4 w-full max-w-lg space-y-3">
-        <div className="text-lg font-semibold">{initial ? 'Edit lead' : 'Add lead'}</div>
+        <div className="text-lg font-semibold">{initial ? 'Редактировать лид' : 'Добавить лид'}</div>
         <div className="grid grid-cols-2 gap-3">
           <input className="border rounded p-2 col-span-2" placeholder="Имя"
                  value={form.name ?? ''} onChange={e => set('name', e.target.value)} />
@@ -61,8 +61,8 @@ export default function LeadModal({
           </select>
         </div>
         <div className="flex justify-end gap-2">
-          <button className="px-3 py-2 rounded bg-gray-200" onClick={onClose}>Cancel</button>
-          <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={save}>Save</button>
+          <button className="px-3 py-2 rounded bg-gray-200" onClick={onClose}>Отмена</button>
+          <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={save}>Сохранить</button>
         </div>
       </div>
     </div>
