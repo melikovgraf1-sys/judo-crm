@@ -70,6 +70,7 @@ export default function LeadsPage() {
     const { error } = await supabase.from('leads').update({ stage }).eq('id', id);
     if (error) {
       console.error(error);
+      setErrorMsg(error.message);
       setLeads(previous);
     }
   }
@@ -90,19 +91,29 @@ export default function LeadsPage() {
     group_id: string | null;
   }) {
     setErrorMsg(null);
-    const { data, error } = await supabase
+    const base = { name, phone, source, stage: 'queue' as const };
+    const optional = {
+      ...(birth_date ? { birth_date } : {}),
+      ...(district ? { district } : {}),
+      ...(group_id ? { group_id } : {}),
+    };
+
+    let data;
+    let error;
+    ({ data, error } = await supabase
       .from('leads')
-      .insert({
-        name,
-        phone,
-        source,
-        stage: 'queue',
-        birth_date,
-        district,
-        group_id,
-      })
+      .insert({ ...base, ...optional })
       .select('*')
-      .single();
+      .single());
+
+    if (error && /column/.test(error.message)) {
+      ({ data, error } = await supabase
+        .from('leads')
+        .insert(base)
+        .select('*')
+        .single());
+    }
+
     if (error) {
       console.error(error);
       setErrorMsg(error.message);

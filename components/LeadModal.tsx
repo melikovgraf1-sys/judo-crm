@@ -37,24 +37,43 @@ export default function LeadModal({
     setForm((s) => ({ ...s, [k]: v }));
 
   const save = async () => {
-    if (!form.name) { alert('Введите имя'); return; }
-    if (!form.source) { alert('Выберите источник'); return; }
-    const payload = {
+    if (!form.name) {
+      alert('Введите имя');
+      return;
+    }
+    if (!form.source) {
+      alert('Выберите источник');
+      return;
+    }
+
+    const base = {
       name: form.name,
       phone: form.phone ?? null,
       source: form.source,
       stage: (form.stage as Lead['stage']) ?? 'queue',
-      birth_date: form.birth_date ?? null,
-      district: form.district ?? null,
-      group_id: form.group_id ?? null,
     };
+    const optional = {
+      ...(form.birth_date ? { birth_date: form.birth_date } : {}),
+      ...(form.district ? { district: form.district } : {}),
+      ...(form.group_id ? { group_id: form.group_id } : {}),
+    };
+
     let error;
-    if (initial?.id) {
-      ({ error } = await supabase.from('leads').update(payload).eq('id', initial.id));
-    } else {
-      ({ error } = await supabase.from('leads').insert(payload));
+    const attempt = async (payload: Record<string, unknown>) => {
+      if (initial?.id) {
+        return supabase.from('leads').update(payload).eq('id', initial.id);
+      }
+      return supabase.from('leads').insert(payload);
+    };
+
+    ({ error } = await attempt({ ...base, ...optional }));
+    if (error && /column/.test(error.message)) {
+      ({ error } = await attempt(base));
     }
-    if (error) { alert(error.message); return; }
+    if (error) {
+      alert(error.message);
+      return;
+    }
     onSaved();
   };
 
