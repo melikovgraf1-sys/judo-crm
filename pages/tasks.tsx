@@ -1,53 +1,86 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import type { Task } from '../lib/types';
+import type { Task, TaskTag } from '../lib/types';
+import { createTask, fetchTasks, updateTask, deleteTask } from '../lib/tasks';
 
 type Payment = { id: string; client_id: string };
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringDay, setRecurringDay] = useState(1);
+  const [tag, setTag] = useState<TaskTag>('other');
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    async function loadFromPayments() {
-      const { data, error } = await supabase
-        .from('payments')
-        .select('id, client_id');
-      if (!error && data) {
-        const paymentTasks: Task[] = (data as Payment[]).map((p) => ({
-          id: `payment-${p.id}`,
-          title: `Обработать оплату клиента ${p.client_id}`,
-          completed: false,
-          payment_id: p.id,
-        }));
-        setTasks((prev) => [...prev, ...paymentTasks]);
+    async function load() {
+      try {
+        const dbTasks = await fetchTasks();
+        setTasks(dbTasks);
+        const { data, error } = await supabase
+          .from('payments')
+          .select('id, client_id');
+        if (!error && data) {
+          const paymentTasks: Task[] = (data as Payment[]).map((p) => ({
+            id: `payment-${p.id}`,
+            title: `Обработать оплату клиента ${p.client_id}`,
+            completed: false,
+            payment_id: p.id,
+            is_recurring: false,
+            due_date: null,
+            recurring_day: null,
+            tag: 'payment',
+          }));
+          setTasks((prev) => [...prev, ...paymentTasks]);
+        }
+      } catch (err) {
+        console.error(err);
       }
     }
-    loadFromPayments();
+    load();
   }, []);
 
-  const addTask = () => {
+  const addTask = async () => {
     if (!title.trim()) {
       return;
     }
-    const newTask: Task = {
-      id: `manual-${Date.now()}`,
+    const task = await createTask({
       title: title.trim(),
       completed: false,
       payment_id: null,
-    };
-    setTasks((prev) => [...prev, newTask]);
+      is_recurring: isRecurring,
+      due_date: isRecurring ? null : dueDate,
+      recurring_day: isRecurring ? recurringDay : null,
+      tag,
+    });
+    setTasks((prev) => [...prev, task]);
     setTitle('');
+    setDueDate('');
+    setRecurringDay(1);
+    setIsRecurring(false);
+    setTag('other');
     setShowForm(false);
   };
 
-  const toggle = (id: string) => {
+  const toggle = async (id: string) => {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+    const updated = !task.completed;
     setTasks((prev) =>
-      prev.map((t) =>
-        t.id === id ? { ...t, completed: !t.completed } : t
-      )
+      prev.map((t) => (t.id === id ? { ...t, completed: updated } : t))
     );
+    if (!id.startsWith('payment-')) {
+      await updateTask(id, { completed: updated });
+    }
+  };
+
+  const remove = async (id: string) => {
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+    if (!id.startsWith('payment-')) {
+      await deleteTask(id);
+    }
   };
 
   return (
@@ -72,11 +105,53 @@ export default function TasksPage() {
               placeholder="Task title"
               autoFocus
             />
+            <div className="flex items-center gap-2">
+              <label className="text-sm flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  checked={isRecurring}
+                  onChange={(e) => setIsRecurring(e.target.checked)}
+                />
+                Регулярная
+              </label>
+              {isRecurring ? (
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  value={recurringDay}
+                  onChange={(e) => setRecurringDay(Number(e.target.value))}
+                  className="border px-2 py-1 rounded w-20"
+                  placeholder="День"
+                />
+              ) : (
+                <input
+                  type="date"
+                  className="border px-2 py-1 rounded w-full"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                />
+              )}
+            </div>
+            <select
+              className="border px-2 py-1 rounded w-full"
+              value={tag}
+              onChange={(e) => setTag(e.target.value as TaskTag)}
+            >
+              <option value="rent">Аренда</option>
+              <option value="payment">Платеж</option>
+              <option value="birthday">День рождения</option>
+              <option value="other">Другое</option>
+            </select>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => {
                   setShowForm(false);
                   setTitle('');
+                  setDueDate('');
+                  setRecurringDay(1);
+                  setIsRecurring(false);
+                  setTag('other');
                 }}
                 className="px-3 py-1 border rounded"
               >
@@ -94,16 +169,34 @@ export default function TasksPage() {
       )}
       <ul className="space-y-2">
         {tasks.map((task) => (
-          <li key={task.id} className="flex items-center">
+          <li key={task.id} className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={task.completed}
               onChange={() => toggle(task.id)}
-              className="mr-2"
             />
-            <span className={task.completed ? 'line-through text-gray-500' : ''}>
+            <span
+              className={task.completed ? 'line-through text-gray-500' : ''}
+            >
               {task.title}
             </span>
+            {task.due_date && (
+              <span className="text-sm text-gray-500">{task.due_date}</span>
+            )}
+            {task.is_recurring && (
+              <span className="text-xs bg-gray-200 px-2 py-0.5 rounded">
+                ежемес. {task.recurring_day}
+              </span>
+            )}
+            <span className="ml-auto text-xs bg-blue-100 px-2 py-0.5 rounded">
+              {task.tag}
+            </span>
+            <button
+              onClick={() => remove(task.id)}
+              className="text-red-600 hover:text-red-800"
+            >
+              ×
+            </button>
           </li>
         ))}
         {tasks.length === 0 && (
