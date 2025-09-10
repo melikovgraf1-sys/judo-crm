@@ -88,14 +88,19 @@ export default function LeadsPage() {
       .single();
     if (error) {
       console.error(error);
-    } else if (data) {
+      await loadData();
+      return;
+    }
+
+    if (data) {
       setLeads((prev) => ({
         ...prev,
         queue: [data as Lead, ...prev.queue],
       }));
+      return;
     }
 
-    // Refresh leads to ensure UI stays in sync even if the inserted row isn't returned
+    // If Supabase didn't return the inserted row, reload the list
     await loadData();
   }
 
