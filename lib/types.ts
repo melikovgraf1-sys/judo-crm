@@ -11,7 +11,31 @@ export type Client = {
   gender: 'm' | 'f' | null;
   payment_status: 'pending' | 'active' | 'debt' | null;
   payment_method: 'cash' | 'transfer' | null;
-  district: string | null;
+  district: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
+};
+
+export type Lead = {
+  id: string;
+  created_at: string;
+  name: string;
+  phone: string | null;
+  source: 'instagram' | 'whatsapp' | 'telegram';
+  stage: 'queue' | 'hold' | 'trial' | 'awaiting_payment' | 'paid' | 'canceled';
+};
+
+
+export type AttendanceRecord = {
+  id: string;
+  client_id: string;
+  date: string;
+  present: boolean;
+};
+
+export type Task = {
+  id: string;
+  title: string;
+  completed: boolean;
+  payment_id: string | null;
 };
 
 export const LEAD_SOURCES = ['instagram', 'whatsapp', 'telegram'] as const;

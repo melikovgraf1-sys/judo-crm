@@ -49,7 +49,9 @@ export default function ClientModal({
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-4 w-full max-w-lg space-y-3">
-        <div className="text-lg font-semibold">{initial ? 'Edit client' : 'Add client'}</div>
+        <div className="text-lg font-semibold">
+          {initial ? 'Edit client' : 'Add client'}
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <input className="border rounded p-2 col-span-1" placeholder="Имя"
                  value={form.first_name ?? ''} onChange={e => set('first_name', e.target.value)} />
@@ -63,10 +65,28 @@ export default function ClientModal({
             <option value="telegram">Telegram</option>
             <option value="instagram">Instagram</option>
           </select>
-          <input type="date" className="border rounded p-2 col-span-1" value={form.birth_date ?? ''} onChange={e => set('birth_date', e.target.value)} />
-          <input className="border rounded p-2 col-span-1" placeholder="Родитель"
-                 value={form.parent_name ?? ''} onChange={e => set('parent_name', e.target.value)} />
-          <input type="date" className="border rounded p-2 col-span-1" value={form.start_date ?? ''} onChange={e => set('start_date', e.target.value)} />
+          <input
+            type="date"
+            className="border rounded p-2 col-span-1"
+            placeholder="Дата рождения"
+            aria-label="Дата рождения"
+            value={form.birth_date ?? ''}
+            onChange={e => set('birth_date', e.target.value)}
+          />
+          <input
+            className="border rounded p-2 col-span-1"
+            placeholder="Родитель"
+            value={form.parent_name ?? ''}
+            onChange={e => set('parent_name', e.target.value)}
+          />
+          <input
+            type="date"
+            className="border rounded p-2 col-span-1"
+            placeholder="Начало посещения"
+            aria-label="Начало посещения"
+            value={form.start_date ?? ''}
+            onChange={e => set('start_date', e.target.value)}
+          />
           <select className="border rounded p-2 col-span-1" value={form.gender ?? ''} onChange={e => set('gender', e.target.value || null)}>
             <option value="">Пол</option>
             <option value="m">М</option>
@@ -83,8 +103,16 @@ export default function ClientModal({
             <option value="cash">Нал</option>
             <option value="transfer">Перевод</option>
           </select>
-          <input className="border rounded p-2 col-span-2" placeholder="Район"
-                 value={form.district ?? ''} onChange={e => set('district', e.target.value)} />
+          <select
+            className="border rounded p-2 col-span-2"
+            value={form.district ?? ''}
+            onChange={e => set('district', e.target.value || null)}
+          >
+            <option value="">Район</option>
+            <option value="Центр">Центр</option>
+            <option value="Джикджилли">Джикджилли</option>
+            <option value="Махмутлар">Махмутлар</option>
+          </select>
         </div>
         <div className="flex justify-end gap-2">
           <button className="px-3 py-2 rounded bg-gray-200" onClick={onClose}>Cancel</button>
