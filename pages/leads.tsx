@@ -4,10 +4,9 @@ import {
   LEAD_STAGES,
   type Lead,
   type LeadStage,
-  type LeadSource,
 } from '../lib/types';
 import LeadCard from '../components/LeadCard';
-import LeadForm from '../components/LeadForm';
+import LeadModal from '../components/LeadModal';
 
 type StageMap = Record<LeadStage, Lead[]>;
 
@@ -21,6 +20,7 @@ function emptyStageMap(): StageMap {
 export default function LeadsPage() {
   const [leads, setLeads] = useState<StageMap>(emptyStageMap());
   const [loading, setLoading] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -47,15 +47,6 @@ export default function LeadsPage() {
     setLoading(false);
   }
 
-  async function addLead(data: { name: string; phone: string | null; source: LeadSource }) {
-    const { error } = await supabase.from('leads').insert({ ...data, stage: 'queue' });
-    if (error) {
-      console.error(error);
-      return;
-    }
-    await loadData();
-  }
-
   async function changeStage(id: number, stage: LeadStage) {
     const previous = leads;
     setLeads((prev) => {
@@ -80,7 +71,14 @@ export default function LeadsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Leads</h1>
-      <LeadForm onAdd={addLead} />
+      <div className="mb-4">
+        <button
+          onClick={() => setOpenModal(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          + Add Lead
+        </button>
+      </div>
       {loading && <div className="text-gray-500">loading…</div>}
       <div className="flex gap-4 overflow-x-auto">
         {LEAD_STAGES.map((stage) => (
@@ -92,6 +90,15 @@ export default function LeadsPage() {
           </div>
         ))}
       </div>
+      {openModal && (
+        <LeadModal
+          onClose={() => setOpenModal(false)}
+          onSaved={() => {
+            setOpenModal(false);
+            loadData();
+          }}
+        />
+      )}
     </div>
   );
 }

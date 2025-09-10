@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import type { Client } from '../lib/types';
+import { DISTRICT_OPTIONS } from '../lib/districts';
 
 export default function ClientModal({
   initial,
   onClose,
   onSaved,
+  groupId,
+  districts = [...DISTRICT_OPTIONS],
 }: {
-  initial?: Client | null;
+  initial?: Partial<Client> | null;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (client?: Client) => void;
+  groupId?: string;
+  districts?: string[];
 }) {
   const [form, setForm] = useState<Partial<Client>>({});
 
@@ -37,13 +42,20 @@ export default function ClientModal({
     };
 
     let error;
+    let data;
     if (initial?.id) {
       ({ error } = await supabase.from('clients').update(payload).eq('id', initial.id));
     } else {
-      ({ error } = await supabase.from('clients').insert(payload));
+      ({ data, error } = await supabase.from('clients').insert(payload).select().single());
+      if (!error && groupId && data) {
+        const { error: cgError } = await supabase
+          .from('client_groups')
+          .insert({ client_id: data.id, group_id: groupId });
+        if (cgError) { alert(cgError.message); return; }
+      }
     }
     if (error) { alert(error.message); return; }
-    onSaved();
+    onSaved(data as Client | undefined);
   };
 
   return (

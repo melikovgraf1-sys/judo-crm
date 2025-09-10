@@ -20,7 +20,7 @@ export default function TasksPage() {
           completed: false,
           payment_id: p.id,
         }));
-        setTasks(paymentTasks);
+        setTasks((prev) => [...prev, ...paymentTasks]);
       }
     }
     loadFromPayments();
