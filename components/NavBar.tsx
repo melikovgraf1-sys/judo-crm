@@ -4,15 +4,12 @@ import React from 'react';
 
 const NavLink = ({ href, children }:{href:string; children:React.ReactNode}) => {
   const { pathname } = useRouter();
-  const active = pathname === href;
+  const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const className =
+    'px-3 py-2 rounded-xl text-sm ' +
+    (active ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100');
   return (
-    <Link
-      href={href}
-      className={
-        'px-3 py-2 rounded-xl text-sm ' +
-        (active ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100')
-      }
-    >
+    <Link href={href} className={className} aria-current={active ? 'page' : undefined}>
       {children}
     </Link>
   );
