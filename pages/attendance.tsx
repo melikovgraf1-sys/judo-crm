@@ -1,21 +1,24 @@
+'use client';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Client, AttendanceRecord } from '../lib/types';
 
-export default function AttendancePage() {
-  const [clients, setClients] = useState<Client[]>([]);
-  const [records, setRecords] = useState<Record<string, boolean>>({});
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+type Group = {
+  id: string;
+  age_band: string;
+  schedule?: string | null;
+};
 
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase
-        .from('clients')
-        .select('id, first_name, last_name')
-        .order('first_name', { ascending: true });
-      if (!error && data) setClients(data as Client[]);
-    })();
-  }, []);
+type GroupData = Group & { clients: Client[] };
+
+const DISTRICTS = ['Центр', 'Джикджилли', 'Махмутлар'];
+
+export default function AttendancePage() {
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [records, setRecords] = useState<Record<string, boolean>>({});
+  const [openDistricts, setOpenDistricts] = useState<Record<string, boolean>>({});
+  const [groups, setGroups] = useState<Record<string, GroupData[]>>({});
+  const [loading, setLoading] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     (async () => {
@@ -44,6 +47,40 @@ export default function AttendancePage() {
     if (error) alert(error.message);
   }
 
+  async function loadDistrict(district: string) {
+    setLoading((p) => ({ ...p, [district]: true }));
+    const { data, error } = await supabase
+      .from('groups')
+      .select(
+        'id, age_band, schedule, client_groups(client:clients(id, first_name, last_name))'
+      )
+      .eq('district', district)
+      .order('age_band', { ascending: true })
+      .order('schedule', { ascending: true })
+      .returns<(Group & { client_groups: { client: Client }[] })[]>();
+
+    if (!error && data) {
+      const result: GroupData[] = data.map((g) => ({
+        id: g.id,
+        age_band: g.age_band,
+        schedule: g.schedule,
+        clients: (g.client_groups || []).map((cg) => cg.client),
+      }));
+      setGroups((p) => ({ ...p, [district]: result }));
+    } else {
+      setGroups((p) => ({ ...p, [district]: [] }));
+    }
+
+    setLoading((p) => ({ ...p, [district]: false }));
+  }
+
+  const toggleDistrict = (district: string) => {
+    setOpenDistricts((prev) => ({ ...prev, [district]: !prev[district] }));
+    if (!groups[district]) {
+      loadDistrict(district);
+    }
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Журнал посещений</h1>
@@ -55,23 +92,53 @@ export default function AttendancePage() {
           className="border rounded px-3 py-2"
         />
       </div>
-      <div className="space-y-2">
-        {clients.map((c) => (
-          <label key={c.id} className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={!!records[c.id]}
-              onChange={() => toggle(c.id)}
-            />
-            <span>
-              {c.first_name} {c.last_name}
-            </span>
-          </label>
+      <div className="space-y-4">
+        {DISTRICTS.map((d) => (
+          <div key={d} className="border rounded-xl bg-white/70 shadow">
+            <button
+              className="w-full text-left px-4 py-2 font-semibold"
+              onClick={() => toggleDistrict(d)}
+            >
+              {d}
+            </button>
+            {openDistricts[d] && (
+              <div className="p-4 space-y-4">
+                {loading[d] && (
+                  <div className="text-sm text-gray-500">loading…</div>
+                )}
+                {!loading[d] &&
+                  (groups[d] || []).map((g) => (
+                    <div key={g.id} className="space-y-2">
+                      <div className="font-semibold">
+                        {g.age_band}
+                        {g.schedule ? ` • ${g.schedule}` : ''}
+                      </div>
+                      <div className="pl-4 space-y-1">
+                        {g.clients.map((c) => (
+                          <label key={c.id} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={!!records[c.id]}
+                              onChange={() => toggle(c.id)}
+                            />
+                            <span>
+                              {c.first_name}
+                              {c.last_name ? ` ${c.last_name}` : ''}
+                            </span>
+                          </label>
+                        ))}
+                        {g.clients.length === 0 && (
+                          <div className="text-sm text-gray-500">Клиентов нет</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
         ))}
-        {clients.length === 0 && (
-          <div className="text-gray-500">Клиентов нет</div>
-        )}
       </div>
     </div>
   );
 }
+

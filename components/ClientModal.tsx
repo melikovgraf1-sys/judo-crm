@@ -44,7 +44,10 @@ export default function ClientModal({
     let error;
     let data;
     if (initial?.id) {
-      ({ error } = await supabase.from('clients').update(payload).eq('id', initial.id));
+      ({ error } = await supabase
+        .from('clients')
+        .update(payload, { returning: 'minimal' })
+        .eq('id', initial.id));
     } else {
       ({ data, error } = await supabase.from('clients').insert(payload).select().single());
       if (!error && groupId && data) {
