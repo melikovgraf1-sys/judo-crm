@@ -70,16 +70,16 @@ export default function LeadsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Leads</h1>
+      <h1 className="text-2xl font-bold mb-4">Заявки</h1>
       <div className="mb-4">
         <button
           onClick={() => setOpenModal(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          + Add Lead
+          + Добавить заявку
         </button>
       </div>
-      {loading && <div className="text-gray-500">loading…</div>}
+      {loading && <div className="text-gray-500">загрузка…</div>}
       <div className="flex gap-4 overflow-x-auto">
         {LEAD_STAGES.map((stage) => (
           <div key={stage.key} className="w-64 shrink-0">

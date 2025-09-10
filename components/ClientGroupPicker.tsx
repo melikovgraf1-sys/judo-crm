@@ -86,7 +86,7 @@ export default function ClientGroupPicker({
   }
 
   if (loading) {
-    return <div className="text-sm text-gray-500">loading groups…</div>;
+    return <div className="text-sm text-gray-500">загрузка групп…</div>;
   }
 
   return (
@@ -94,7 +94,7 @@ export default function ClientGroupPicker({
       {/* Назначенные группы — чипсы */}
       <div className="flex flex-wrap gap-2">
         {clientGroupIds.length === 0 && (
-          <span className="text-sm text-gray-500">not assigned</span>
+          <span className="text-sm text-gray-500">не назначено</span>
         )}
         {allGroups
           .filter((g) => assigned.has(g.id))
@@ -108,7 +108,7 @@ export default function ClientGroupPicker({
                 disabled={saving}
                 onClick={() => remove(g.id)}
                 className="ml-1 rounded-full bg-blue-100 hover:bg-blue-200 px-2"
-                title="Remove"
+                title="Удалить"
               >
                 ×
               </button>
@@ -129,7 +129,7 @@ export default function ClientGroupPicker({
           disabled={saving}
         >
           <option value="" disabled>
-            + add to group…
+            + добавить в группу…
           </option>
           {allGroups
             .filter((g) => !assigned.has(g.id))
@@ -139,7 +139,7 @@ export default function ClientGroupPicker({
               </option>
             ))}
         </select>
-        {saving && <span className="text-xs text-gray-400">saving…</span>}
+        {saving && <span className="text-xs text-gray-400">сохранение…</span>}
       </div>
     </div>
   );

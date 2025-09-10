@@ -46,13 +46,13 @@ export default function ClientModal({
     if (initial?.id) {
       ({ error } = await supabase
         .from('clients')
-        .update(basePayload, { returning: 'minimal' })
+        .update(basePayload)
         .eq('id', initial.id));
     } else {
       const { data: { user } } = await supabase.auth.getUser();
       ({ error } = await supabase
         .from('clients')
-        .insert({ ...basePayload, user_id: user?.id }, { returning: 'minimal' }));
+        .insert({ ...basePayload, user_id: user?.id }));
     }
     if (error) { alert(error.message); return; }
     onSaved(data as Client | undefined);
@@ -62,7 +62,7 @@ export default function ClientModal({
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-4 w-full max-w-lg space-y-3">
         <div className="text-lg font-semibold">
-          {initial ? 'Edit client' : 'Add client'}
+          {initial ? 'Редактировать клиента' : 'Добавить клиента'}
         </div>
         <div className="grid grid-cols-2 gap-3">
           <label className="col-span-1 flex flex-col">
@@ -97,9 +97,9 @@ export default function ClientModal({
               onChange={e => set('channel', e.target.value || null)}
             >
               <option value="">Не выбран</option>
-              <option value="whatsapp">WhatsApp</option>
-              <option value="telegram">Telegram</option>
-              <option value="instagram">Instagram</option>
+              <option value="whatsapp">Ватсап</option>
+              <option value="telegram">Телеграм</option>
+              <option value="instagram">Инстаграм</option>
             </select>
           </label>
           <label className="col-span-1 flex flex-col">
@@ -182,8 +182,8 @@ export default function ClientModal({
           </label>
         </div>
         <div className="flex justify-end gap-2">
-          <button className="px-3 py-2 rounded bg-gray-200" onClick={onClose}>Cancel</button>
-          <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={save}>Save</button>
+          <button className="px-3 py-2 rounded bg-gray-200" onClick={onClose}>Отмена</button>
+          <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={save}>Сохранить</button>
         </div>
       </div>
     </div>

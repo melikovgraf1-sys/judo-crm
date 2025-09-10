@@ -101,13 +101,13 @@ export default function TasksPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Tasks</h1>
+      <h1 className="text-2xl font-bold mb-4">Задачи</h1>
       <div className="mb-4">
         <button
           onClick={() => setShowForm(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          + Add Task
+          + Добавить задачу
         </button>
       </div>
       {showForm && (
@@ -118,7 +118,7 @@ export default function TasksPage() {
               className="border px-2 py-1 rounded w-full"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Task title"
+              placeholder="Название задачи"
               autoFocus
             />
             <div className="flex items-center gap-2">
@@ -198,13 +198,13 @@ export default function TasksPage() {
                 }}
                 className="px-3 py-1 border rounded"
               >
-                Cancel
+                Отмена
               </button>
               <button
                 onClick={addTask}
                 className="bg-blue-600 text-white px-3 py-1 rounded"
               >
-                Save
+                Сохранить
               </button>
             </div>
           </div>
@@ -254,7 +254,7 @@ export default function TasksPage() {
           </li>
         ))}
         {tasks.length === 0 && (
-          <div className="text-gray-500">no tasks yet</div>
+          <div className="text-gray-500">задач пока нет</div>
         )}
       </ul>
     </div>
