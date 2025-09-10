@@ -30,7 +30,7 @@ export default function LeadsPage() {
     setLoading(true);
     const { data, error } = await supabase
       .from('leads')
-      .select('id, created_at, name, phone, source, stage')
+      .select('id, created_at, name, phone, source, stage, birth_date, district, group_id')
       .order('created_at', { ascending: false });
 
     if (error) {
