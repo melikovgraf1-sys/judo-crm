@@ -40,7 +40,7 @@ export default function DistrictsPage() {
       <div className="max-w-3xl mx-auto px-4 mt-6">
         <button
           onClick={addDistrict}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-200 text-blue-900 px-4 py-2 rounded hover:bg-blue-300"
         >
           + Добавить район
         </button>
@@ -65,7 +65,7 @@ export default function DistrictsPage() {
                   ))}
                 <button
                   onClick={() => { setSelectedDistrict(d); setOpenAddGroup(true); }}
-                  className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                  className="bg-blue-300 text-blue-900 px-3 py-1 rounded hover:bg-blue-400"
                 >
                   + Добавить группу
                 </button>
