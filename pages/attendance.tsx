@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Client, AttendanceRecord } from '../lib/types';
@@ -48,21 +49,28 @@ export default function AttendancePage() {
 
   async function loadDistrict(district: string) {
     setLoading((p) => ({ ...p, [district]: true }));
-    const { data: groupsData } = await supabase
+    const { data, error } = await supabase
       .from('groups')
-      .select('id, age_band, schedule')
+      .select(
+        'id, age_band, schedule, client_groups(client:clients(id, first_name, last_name))'
+      )
       .eq('district', district)
-      .order('age_band', { ascending: true });
-    const result: GroupData[] = [];
-    for (const g of groupsData || []) {
-      const { data: cg } = await supabase
-        .from('client_groups')
-        .select('client:clients(id, first_name, last_name)')
-        .eq('group_id', g.id)
-        .returns<{ client: Client }[]>();
-      result.push({ ...g, clients: (cg || []).map((r) => r.client) });
+      .order('age_band', { ascending: true })
+      .order('schedule', { ascending: true })
+      .returns<(Group & { client_groups: { client: Client }[] })[]>();
+
+    if (!error && data) {
+      const result: GroupData[] = data.map((g) => ({
+        id: g.id,
+        age_band: g.age_band,
+        schedule: g.schedule,
+        clients: (g.client_groups || []).map((cg) => cg.client),
+      }));
+      setGroups((p) => ({ ...p, [district]: result }));
+    } else {
+      setGroups((p) => ({ ...p, [district]: [] }));
     }
-    setGroups((p) => ({ ...p, [district]: result }));
+
     setLoading((p) => ({ ...p, [district]: false }));
   }
 
