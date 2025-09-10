@@ -3,16 +3,19 @@ import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import GroupCard, { Group } from './GroupCard';
 import type { Client } from '../lib/types';
+import ClientModal from './ClientModal';
 
 type Props = {
   group: Group;
   onChanged?: () => void;
+  districts: string[];
 };
 
-export default function GroupWithClients({ group, onChanged }: Props) {
+export default function GroupWithClients({ group, onChanged, districts }: Props) {
   const [open, setOpen] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
+  const [openClient, setOpenClient] = useState(false);
 
   async function toggle() {
     if (!open && clients.length === 0) {
@@ -32,7 +35,12 @@ export default function GroupWithClients({ group, onChanged }: Props) {
 
   return (
     <div className="space-y-2">
-      <GroupCard group={group} onChanged={onChanged} />
+      <GroupCard
+        group={group}
+        onChanged={onChanged}
+        districts={districts}
+        onAddClient={() => setOpenClient(true)}
+      />
       <button
         className="text-sm text-blue-600 underline"
         onClick={toggle}
@@ -52,6 +60,15 @@ export default function GroupWithClients({ group, onChanged }: Props) {
             </div>
           ))}
         </div>
+      )}
+      {openClient && (
+        <ClientModal
+          initial={{ district: group.district }}
+          onClose={() => setOpenClient(false)}
+          onSaved={(c) => { if (c) setClients((prev) => [...prev, c]); setOpenClient(false); }}
+          groupId={group.id}
+          districts={districts}
+        />
       )}
     </div>
   );

@@ -1,18 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 type Props = {
   open: boolean;
   onClose: () => void;
   onCreated: () => void; // перезагрузить список
+  districts: string[];
+  initialDistrict?: string;
 };
 
-export default function AddGroupModal({ open, onClose, onCreated }: Props) {
-  const [district, setDistrict] = useState('');
+export default function AddGroupModal({ open, onClose, onCreated, districts, initialDistrict }: Props) {
+  const [district, setDistrict] = useState(initialDistrict ?? districts[0] ?? '');
   const [ageBand, setAgeBand] = useState('');
   const [capacity, setCapacity] = useState<number>(16);
   const [loading, setLoading] = useState(false);
   const disabled = loading || !district || !ageBand || !capacity;
+
+  useEffect(() => {
+    setDistrict(initialDistrict ?? districts[0] ?? '');
+  }, [initialDistrict, districts]);
 
   if (!open) return null;
 
@@ -38,12 +44,15 @@ export default function AddGroupModal({ open, onClose, onCreated }: Props) {
         <h3 className="text-xl font-semibold mb-4">Добавить группу</h3>
 
         <label className="block text-sm mb-1">Район</label>
-        <input
+        <select
           className="w-full border rounded px-3 py-2 mb-3"
-          placeholder="Напр. Центр, Махмутлар…"
           value={district}
           onChange={(e) => setDistrict(e.target.value)}
-        />
+        >
+          {districts.map((d) => (
+            <option key={d} value={d}>{d}</option>
+          ))}
+        </select>
 
         <label className="block text-sm mb-1">Возраст (диапазон)</label>
         <input

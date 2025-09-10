@@ -3,6 +3,13 @@ import { supabase } from '../lib/supabaseClient';
 import type { Lead } from '../lib/types';
 import { LEAD_STAGES } from '../lib/types';
 
+type Group = {
+  id: string;
+  district: string;
+  age_band: string;
+  name?: string | null;
+};
+
 export default function LeadModal({
   initial,
   onClose,
@@ -13,8 +20,18 @@ export default function LeadModal({
   onSaved: () => void;
 }) {
   const [form, setForm] = useState<Partial<Lead>>({});
+  const [groups, setGroups] = useState<Group[]>([]);
 
   useEffect(() => { setForm(initial ?? {}); }, [initial]);
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from('groups')
+        .select('id, district, age_band, name')
+        .order('district', { ascending: true });
+      if (!error) setGroups(data || []);
+    })();
+  }, []);
 
   const set = (k: keyof Lead, v: Lead[keyof Lead]) =>
     setForm((s) => ({ ...s, [k]: v }));
@@ -27,6 +44,9 @@ export default function LeadModal({
       phone: form.phone ?? null,
       source: form.source,
       stage: (form.stage as Lead['stage']) ?? 'queue',
+      birth_date: form.birth_date ?? null,
+      district: form.district ?? null,
+      group_id: form.group_id ?? null,
     };
     let error;
     if (initial?.id) {
@@ -58,6 +78,38 @@ export default function LeadModal({
             {LEAD_STAGES.map(s => (
               <option key={s.key} value={s.key}>{s.title}</option>
             ))}
+          </select>
+          <input
+            type="date"
+            className="border rounded p-2 col-span-1"
+            placeholder="Дата рождения"
+            aria-label="Дата рождения"
+            value={form.birth_date ?? ''}
+            onChange={e => set('birth_date', e.target.value)}
+          />
+          <select
+            className="border rounded p-2 col-span-1"
+            value={form.district ?? ''}
+            onChange={e => set('district', e.target.value || null)}
+          >
+            <option value="">Район</option>
+            <option value="Центр">Центр</option>
+            <option value="Джикджилли">Джикджилли</option>
+            <option value="Махмутлар">Махмутлар</option>
+          </select>
+          <select
+            className="border rounded p-2 col-span-2"
+            value={form.group_id ?? ''}
+            onChange={e => set('group_id', e.target.value || null)}
+          >
+            <option value="">Группа</option>
+            {groups
+              .filter(g => !form.district || g.district === form.district)
+              .map(g => (
+                <option key={g.id} value={g.id}>
+                  {g.district} • {g.age_band}
+                </option>
+              ))}
           </select>
         </div>
         <div className="flex justify-end gap-2">
