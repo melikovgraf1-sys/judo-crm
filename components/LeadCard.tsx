@@ -1,13 +1,43 @@
-import type { Lead } from '../lib/types';
+import Link from 'next/link';
+import { format, isValid, parseISO } from 'date-fns';
+import type { Lead, LeadStage } from '../lib/types';
+import { LEAD_STAGES, LEAD_SOURCE_TITLES } from '../lib/types';
+import { cn } from '../lib/utils';
 
-export default function LeadCard({ lead }: { lead: Lead }) {
+export type LeadCardProps = {
+  lead: Lead;
+  onStageChange: (id: number, stage: LeadStage) => void;
+  className?: string;
+};
+
+export default function LeadCard({ lead, onStageChange, className }: LeadCardProps) {
+  const createdAt = lead.created_at ? parseISO(lead.created_at) : null;
+  const createdLabel = createdAt && isValid(createdAt) ? format(createdAt, 'dd.MM.yyyy') : null;
+
   return (
-    <div className="bg-white rounded shadow p-2 mb-2">
-      <div className="font-medium">{lead.name}</div>
-      {lead.phone && (
-        <div className="text-sm text-gray-500">{lead.phone}</div>
-      )}
-      <div className="text-xs text-gray-400 mt-1">{lead.source}</div>
+    <div className={cn('bg-white rounded shadow p-2 mb-2', className)}>
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="font-medium">{lead.name}</div>
+          {lead.phone && <div className="text-sm text-gray-500">{lead.phone}</div>}
+          {createdLabel && <div className="text-xs text-gray-400">{createdLabel}</div>}
+        </div>
+        <Link href={`/leads/${lead.id}`} className="text-xs text-blue-500">
+          View
+        </Link>
+      </div>
+      <select
+        className="mt-2 w-full border rounded text-sm"
+        value={lead.stage}
+        onChange={(e) => onStageChange(lead.id, e.target.value as LeadStage)}
+      >
+        {LEAD_STAGES.map((s) => (
+          <option key={s.key} value={s.key}>
+            {s.title}
+          </option>
+        ))}
+      </select>
+      <div className="text-xs text-gray-400 mt-1">{LEAD_SOURCE_TITLES[lead.source]}</div>
     </div>
   );
 }
