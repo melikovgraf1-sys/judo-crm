@@ -5,6 +5,7 @@ import {
   type Lead,
   type LeadStage,
   type LeadSource,
+  type District,
 } from '../lib/types';
 import LeadCard from '../components/LeadCard';
 import LeadModal from '../components/LeadModal';
@@ -22,8 +23,8 @@ function emptyStageMap(): StageMap {
 export default function LeadsPage() {
   const [leads, setLeads] = useState<StageMap>(emptyStageMap());
   const [loading, setLoading] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Lead | null>(null);
 
   useEffect(() => {
     loadData();
@@ -77,15 +78,29 @@ export default function LeadsPage() {
     name,
     phone,
     source,
+    birth_date,
+    district,
+    group_id,
   }: {
     name: string;
     phone: string | null;
     source: LeadSource;
+    birth_date: string | null;
+    district: District | null;
+    group_id: string | null;
   }) {
     setErrorMsg(null);
     const { data, error } = await supabase
       .from('leads')
-      .insert({ name, phone, source, stage: 'queue' })
+      .insert({
+        name,
+        phone,
+        source,
+        stage: 'queue',
+        birth_date,
+        district,
+        group_id,
+      })
       .select('*')
       .single();
     if (error) {
@@ -115,19 +130,28 @@ export default function LeadsPage() {
       {loading && <div className="text-gray-500">Загрузка…</div>}
       <div className="flex gap-4 overflow-x-auto">
         {LEAD_STAGES.map((stage) => (
-          <div key={stage.key} className="w-64 shrink-0">
+          <div
+            key={stage.key}
+            className="w-64 shrink-0"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              const id = Number(e.dataTransfer.getData('id'));
+              if (!Number.isNaN(id)) changeStage(id, stage.key);
+            }}
+          >
             <h2 className="text-center font-semibold mb-2">{stage.title}</h2>
             {leads[stage.key].map((l) => (
-              <LeadCard key={l.id} lead={l} onStageChange={changeStage} />
+              <LeadCard key={l.id} lead={l} onOpen={(lead) => setEditing(lead)} />
             ))}
           </div>
         ))}
       </div>
-      {openModal && (
+      {editing && (
         <LeadModal
-          onClose={() => setOpenModal(false)}
+          initial={editing}
+          onClose={() => setEditing(null)}
           onSaved={() => {
-            setOpenModal(false);
+            setEditing(null);
             loadData();
           }}
         />
