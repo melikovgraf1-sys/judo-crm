@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import type { Lead, LeadStage, LeadSource } from '../lib/types';
-import { LEAD_STAGES } from '../lib/types';
+import {
+  LEAD_STAGES,
+  type Lead,
+  type LeadStage,
+  type LeadSource,
+} from '../lib/types';
 import LeadCard from '../components/LeadCard';
 import LeadForm from '../components/LeadForm';
 
