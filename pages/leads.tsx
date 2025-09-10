@@ -86,14 +86,17 @@ export default function LeadsPage() {
         'id, created_at, name, phone, source, stage, birth_date, district, group_id'
       )
       .single();
-    if (error || !data) {
+    if (error) {
       console.error(error);
-      return;
+    } else if (data) {
+      setLeads((prev) => ({
+        ...prev,
+        queue: [data as Lead, ...prev.queue],
+      }));
     }
-    setLeads((prev) => ({
-      ...prev,
-      queue: [data as Lead, ...prev.queue],
-    }));
+
+    // Refresh leads to ensure UI stays in sync even if the inserted row isn't returned
+    await loadData();
   }
 
   return (
