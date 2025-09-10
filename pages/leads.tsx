@@ -79,14 +79,21 @@ export default function LeadsPage() {
     phone: string | null;
     source: LeadSource;
   }) {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('leads')
-      .insert({ name, phone, source, stage: 'queue' });
-    if (error) {
+      .insert({ name, phone, source, stage: 'queue' })
+      .select(
+        'id, created_at, name, phone, source, stage, birth_date, district, group_id'
+      )
+      .single();
+    if (error || !data) {
       console.error(error);
       return;
     }
-    await loadData();
+    setLeads((prev) => ({
+      ...prev,
+      queue: [data as Lead, ...prev.queue],
+    }));
   }
 
   return (
