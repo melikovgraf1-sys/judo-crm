@@ -29,6 +29,8 @@ export default function NavBar() {
           <NavLink href="/clients">Clients</NavLink>
           <NavLink href="/leads">Leads</NavLink>
           <NavLink href="/payments">Payments</NavLink>
+          <NavLink href="/tasks">Tasks</NavLink>
+          <NavLink href="/attendance">Журнал посещений</NavLink>
         </nav>
       </div>
     </header>
