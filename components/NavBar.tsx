@@ -19,14 +19,14 @@ export default function NavBar() {
   return (
     <header className="border-b bg-white">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-blue-700">Judo CRM</Link>
+        <Link href="/" className="text-xl font-bold text-blue-700">Дзюдо CRM</Link>
         <nav className="flex gap-2">
-          <NavLink href="/">Dashboard</NavLink>
-          <NavLink href="/groups">Groups</NavLink>
-          <NavLink href="/clients">Clients</NavLink>
-          <NavLink href="/leads">Leads</NavLink>
-          <NavLink href="/payments">Payments</NavLink>
-          <NavLink href="/tasks">Tasks</NavLink>
+          <NavLink href="/">Главная</NavLink>
+          <NavLink href="/districts">Районы</NavLink>
+          <NavLink href="/clients">Клиенты</NavLink>
+          <NavLink href="/leads">Лиды</NavLink>
+          <NavLink href="/payments">Платежи</NavLink>
+          <NavLink href="/tasks">Задачи</NavLink>
           <NavLink href="/attendance">Журнал посещений</NavLink>
         </nav>
       </div>

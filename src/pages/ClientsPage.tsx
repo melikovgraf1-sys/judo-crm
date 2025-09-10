@@ -47,7 +47,7 @@ export default function ClientsPage() {
 
   return (
     <div style={{ padding: "24px" }}>
-      <h1 style={{ fontSize: 28, fontWeight: 600, marginBottom: 16 }}>Clients</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 600, marginBottom: 16 }}>Клиенты</h1>
 
       {/* Форма добавления */}
       <form
@@ -65,25 +65,25 @@ export default function ClientsPage() {
         }}
       >
         <input
-          placeholder="Full name"
+          placeholder="ФИО"
           value={form.name}
           onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
           style={inputStyle}
         />
         <input
-          placeholder="Phone"
+          placeholder="Телефон"
           value={form.phone}
           onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
           style={inputStyle}
         />
         <input
-          placeholder="Group ID (optional)"
+          placeholder="ID группы (необязательно)"
           value={form.group}
           onChange={(e) => setForm((f) => ({ ...f, group: e.target.value }))}
           style={inputStyle}
         />
         <button type="submit" style={primaryBtnStyle}>
-          Add client
+          Добавить клиента
         </button>
       </form>
 
@@ -93,17 +93,17 @@ export default function ClientsPage() {
           <thead>
             <tr style={{ background: "#f9fafb", color: "#6b7280" }}>
               <th style={thTd}>#</th>
-              <th style={thTd}>Name</th>
-              <th style={thTd}>Phone</th>
-              <th style={thTd}>Group</th>
-              <th style={thTd}>Actions</th>
+              <th style={thTd}>Имя</th>
+              <th style={thTd}>Телефон</th>
+              <th style={thTd}>Группа</th>
+              <th style={thTd}>Действия</th>
             </tr>
           </thead>
           <tbody>
             {items.length === 0 ? (
               <tr>
                 <td style={emptyCell} colSpan={5}>
-                  no clients yet
+                  Клиентов нет
                 </td>
               </tr>
             ) : (
@@ -115,10 +115,10 @@ export default function ClientsPage() {
                   <td style={thTd}>{c.group ?? "—"}</td>
                   <td style={thTd}>
                     <button style={secondaryBtnStyle} onClick={() => alert("Open client card (stub)")}>
-                      Open
+                      Открыть
                     </button>{" "}
                     <button style={secondaryBtnStyle} onClick={() => removeClient(c.id)}>
-                      Delete
+                      Удалить
                     </button>
                   </td>
                 </tr>

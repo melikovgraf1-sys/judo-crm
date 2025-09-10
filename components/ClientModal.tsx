@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import type { Client } from '../lib/types';
+import { DISTRICT_OPTIONS } from '../lib/districts';
 
 export default function ClientModal({
   initial,
   onClose,
   onSaved,
+  groupId,
+  districts = [...DISTRICT_OPTIONS],
 }: {
-  initial?: Client | null;
+  initial?: Partial<Client> | null;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (client?: Client) => void;
+  groupId?: string;
+  districts?: string[];
 }) {
   const [form, setForm] = useState<Partial<Client>>({});
 
@@ -22,7 +27,7 @@ export default function ClientModal({
     // валидация минимальная
     if (!form.first_name) { alert('Введите имя'); return; }
 
-    const payload = {
+    const basePayload = {
       first_name: form.first_name,
       last_name: form.last_name ?? null,
       phone: form.phone ?? null,
@@ -37,20 +42,30 @@ export default function ClientModal({
     };
 
     let error;
+    let data;
     if (initial?.id) {
-      ({ error } = await supabase.from('clients').update(payload).eq('id', initial.id));
+      ({ error } = await supabase
+        .from('clients')
+        .update(basePayload)
+        .eq('id', initial.id));
     } else {
-      ({ error } = await supabase.from('clients').insert(payload));
+      ({ data, error } = await supabase.from('clients').insert(payload).select().single());
+      if (!error && groupId && data) {
+        const { error: cgError } = await supabase
+          .from('client_groups')
+          .insert({ client_id: data.id, group_id: groupId });
+        if (cgError) { alert(cgError.message); return; }
+      }
     }
     if (error) { alert(error.message); return; }
-    onSaved();
+    onSaved(data as Client | undefined);
   };
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-4 w-full max-w-lg space-y-3">
         <div className="text-lg font-semibold">
-          {initial ? 'Edit client' : 'Add client'}
+          {initial ? 'Редактировать клиента' : 'Добавить клиента'}
         </div>
         <div className="grid grid-cols-2 gap-3">
           <input className="border rounded p-2 col-span-1" placeholder="Имя"
@@ -109,14 +124,14 @@ export default function ClientModal({
             onChange={e => set('district', e.target.value || null)}
           >
             <option value="">Район</option>
-            <option value="Центр">Центр</option>
-            <option value="Джикджилли">Джикджилли</option>
-            <option value="Махмутлар">Махмутлар</option>
+            {districts.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
           </select>
         </div>
         <div className="flex justify-end gap-2">
-          <button className="px-3 py-2 rounded bg-gray-200" onClick={onClose}>Cancel</button>
-          <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={save}>Save</button>
+          <button className="px-3 py-2 rounded bg-gray-200" onClick={onClose}>Отмена</button>
+          <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={save}>Сохранить</button>
         </div>
       </div>
     </div>
