@@ -4,9 +4,11 @@ import {
   LEAD_STAGES,
   type Lead,
   type LeadStage,
+  type LeadSource,
 } from '../lib/types';
 import LeadCard from '../components/LeadCard';
 import LeadModal from '../components/LeadModal';
+import LeadForm from '../components/LeadForm';
 
 type StageMap = Record<LeadStage, Lead[]>;
 
@@ -66,6 +68,25 @@ export default function LeadsPage() {
       console.error(error);
       setLeads(previous);
     }
+  }
+
+  async function addLead({
+    name,
+    phone,
+    source,
+  }: {
+    name: string;
+    phone: string | null;
+    source: LeadSource;
+  }) {
+    const { error } = await supabase
+      .from('leads')
+      .insert({ name, phone, source, stage: 'queue' });
+    if (error) {
+      console.error(error);
+      return;
+    }
+    await loadData();
   }
 
   return (
