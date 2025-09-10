@@ -71,6 +71,12 @@ export default function GroupCard({ group, onChanged, onAddClient, districts }: 
         </div>
         <div className="flex gap-2">
           <button
+            className="px-3 py-1 rounded-lg bg-green-600 text-white"
+            onClick={(e) => { e.stopPropagation(); onAddClient?.(); }}
+          >
+            Добавить клиента
+          </button>
+          <button
             className="px-3 py-1 rounded-lg bg-blue-600 text-white"
             onClick={(e) => { e.stopPropagation(); setEditing(true); }}
           >
