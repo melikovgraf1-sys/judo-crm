@@ -12,6 +12,7 @@ export type Client = {
   payment_status: 'pending' | 'active' | 'debt' | null;
   payment_method: 'cash' | 'transfer' | null;
   district: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
+  user_id: string;
 };
 
 export type AttendanceRecord = {
