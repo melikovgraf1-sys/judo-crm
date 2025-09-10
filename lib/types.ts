@@ -22,11 +22,17 @@ export type AttendanceRecord = {
   present: boolean;
 };
 
+export type TaskTag = 'rent' | 'payment' | 'birthday' | 'other';
+
 export type Task = {
   id: string;
   title: string;
   completed: boolean;
   payment_id: string | null;
+  is_recurring: boolean;
+  due_date: string | null;
+  recurring_day: number | null;
+  tag: TaskTag;
 };
 
 export const LEAD_SOURCES = [
@@ -60,4 +66,7 @@ export type Lead = {
   phone: string | null;
   source: LeadSource;
   stage: LeadStage;
+  birth_date: string | null;
+  district: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
+  group_id: string | null;
 };
