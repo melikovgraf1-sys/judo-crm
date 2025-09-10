@@ -12,9 +12,11 @@ export type Group = {
 type Props = {
   group: Group;
   onChanged?: () => void; // вызовем после update/delete
+  onAddClient?: () => void;
+  districts?: string[];
 };
 
-export default function GroupCard({ group, onChanged }: Props) {
+export default function GroupCard({ group, onChanged, onAddClient, districts }: Props) {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -57,7 +59,10 @@ export default function GroupCard({ group, onChanged }: Props) {
 
   if (!editing) {
     return (
-      <div className="border rounded-2xl bg-white/70 shadow p-4 flex items-start justify-between">
+      <div
+        className="border rounded-2xl bg-white/70 shadow p-4 flex items-start justify-between cursor-pointer"
+        onClick={onAddClient}
+      >
         <div>
           <div className="font-semibold">{group.age_band}</div>
           <div className="text-sm text-gray-600">
@@ -66,14 +71,20 @@ export default function GroupCard({ group, onChanged }: Props) {
         </div>
         <div className="flex gap-2">
           <button
+            className="px-3 py-1 rounded-lg bg-blue-400 text-white hover:bg-blue-500"
+            onClick={(e) => { e.stopPropagation(); onAddClient?.(); }}
+          >
+            Добавить клиента
+          </button>
+          <button
             className="px-3 py-1 rounded-lg bg-blue-600 text-white"
-            onClick={() => setEditing(true)}
+            onClick={(e) => { e.stopPropagation(); setEditing(true); }}
           >
             Edit
           </button>
           <button
             className="px-3 py-1 rounded-lg bg-red-600/90 text-white"
-            onClick={handleDelete}
+            onClick={(e) => { e.stopPropagation(); handleDelete(); }}
           >
             Delete
           </button>
@@ -87,11 +98,15 @@ export default function GroupCard({ group, onChanged }: Props) {
       <div className="grid grid-cols-3 gap-3">
         <label className="text-sm">
           Район
-          <input
+          <select
             className="mt-1 w-full rounded-lg border px-3 py-2"
             value={form.district}
             onChange={(e) => setForm({ ...form, district: e.target.value })}
-          />
+          >
+            {districts?.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
         </label>
         <label className="text-sm">
           Возраст
