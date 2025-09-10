@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { format, isValid, parseISO } from 'date-fns';
 import type { Lead, LeadStage } from '../lib/types';
 import { LEAD_STAGES, LEAD_SOURCE_TITLES } from '../lib/types';
 import { cn } from '../lib/utils';
@@ -11,8 +10,11 @@ export type LeadCardProps = {
 };
 
 export default function LeadCard({ lead, onStageChange, className }: LeadCardProps) {
-  const createdAt = lead.created_at ? parseISO(lead.created_at) : null;
-  const createdLabel = createdAt && isValid(createdAt) ? format(createdAt, 'dd.MM.yyyy') : null;
+  const createdAt = lead.created_at ? new Date(lead.created_at) : null;
+  const createdLabel =
+    createdAt && !Number.isNaN(createdAt.getTime())
+      ? new Intl.DateTimeFormat('ru-RU').format(createdAt)
+      : null;
 
   return (
     <div className={cn('bg-white rounded shadow p-2 mb-2', className)}>
