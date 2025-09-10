@@ -34,7 +34,7 @@ export default function LeadsPage() {
     setErrorMsg(null);
     const { data, error } = await supabase
       .from('leads')
-      .select('id, created_at, name, phone, source, stage, birth_date, district, group_id')
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -86,9 +86,7 @@ export default function LeadsPage() {
     const { data, error } = await supabase
       .from('leads')
       .insert({ name, phone, source, stage: 'queue' })
-      .select(
-        'id, created_at, name, phone, source, stage, birth_date, district, group_id'
-      )
+      .select('*')
       .single();
     if (error) {
       console.error(error);
