@@ -23,6 +23,7 @@ export default function LeadsPage() {
   const [leads, setLeads] = useState<StageMap>(emptyStageMap());
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -30,6 +31,7 @@ export default function LeadsPage() {
 
   async function loadData() {
     setLoading(true);
+    setErrorMsg(null);
     const { data, error } = await supabase
       .from('leads')
       .select('id, created_at, name, phone, source, stage, birth_date, district, group_id')
@@ -37,6 +39,7 @@ export default function LeadsPage() {
 
     if (error) {
       console.error(error);
+      setErrorMsg(error.message);
       setLoading(false);
       return;
     }
@@ -79,6 +82,7 @@ export default function LeadsPage() {
     phone: string | null;
     source: LeadSource;
   }) {
+    setErrorMsg(null);
     const { data, error } = await supabase
       .from('leads')
       .insert({ name, phone, source, stage: 'queue' })
@@ -88,6 +92,7 @@ export default function LeadsPage() {
       .single();
     if (error) {
       console.error(error);
+      setErrorMsg(error.message);
       await loadData();
       return;
     }
@@ -108,6 +113,7 @@ export default function LeadsPage() {
     <div>
       <h1 className="text-2xl font-bold mb-4">Лиды</h1>
       <LeadForm onAdd={addLead} />
+      {errorMsg && <div className="text-red-600 mb-2">{errorMsg}</div>}
       {loading && <div className="text-gray-500">Загрузка…</div>}
       <div className="flex gap-4 overflow-x-auto">
         {LEAD_STAGES.map((stage) => (
