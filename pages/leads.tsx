@@ -7,17 +7,15 @@ import LeadForm from '../components/LeadForm';
 
 type StageMap = Record<LeadStage, Lead[]>;
 
-const EMPTY: StageMap = {
-  queue: [],
-  hold: [],
-  trial: [],
-  awaiting_payment: [],
-  paid: [],
-  canceled: [],
-};
+function emptyStageMap(): StageMap {
+  return LEAD_STAGES.reduce((acc, s) => {
+    acc[s.key] = [];
+    return acc;
+  }, {} as StageMap);
+}
 
 export default function LeadsPage() {
-  const [leads, setLeads] = useState<StageMap>(EMPTY);
+  const [leads, setLeads] = useState<StageMap>(emptyStageMap());
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -37,7 +35,7 @@ export default function LeadsPage() {
       return;
     }
 
-    const grouped: StageMap = JSON.parse(JSON.stringify(EMPTY));
+    const grouped: StageMap = emptyStageMap();
     for (const lead of data as Lead[]) {
       grouped[lead.stage].push(lead);
     }
@@ -57,7 +55,7 @@ export default function LeadsPage() {
   async function changeStage(id: number, stage: LeadStage) {
     const previous = leads;
     setLeads((prev) => {
-      const updated: StageMap = JSON.parse(JSON.stringify(EMPTY));
+      const updated: StageMap = emptyStageMap();
       for (const s of LEAD_STAGES) {
         updated[s.key] = prev[s.key].filter((l) => l.id !== id);
       }
