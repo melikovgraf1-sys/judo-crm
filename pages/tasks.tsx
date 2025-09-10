@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import type { Task, TaskTag } from '../lib/types';
+import type { Task, TaskTag, Client, District } from '../lib/types';
 import { createTask, fetchTasks, updateTask, deleteTask } from '../lib/tasks';
 
 type Payment = { id: string; client_id: string };
@@ -12,6 +12,9 @@ export default function TasksPage() {
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringDay, setRecurringDay] = useState(1);
   const [tag, setTag] = useState<TaskTag>('other');
+  const [district, setDistrict] = useState<District>('Центр');
+  const [clients, setClients] = useState<Client[]>([]);
+  const [clientId, setClientId] = useState('');
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
@@ -32,8 +35,17 @@ export default function TasksPage() {
             due_date: null,
             recurring_day: null,
             tag: 'payment',
+            district: null,
+            client_id: p.client_id,
           }));
           setTasks((prev) => [...prev, ...paymentTasks]);
+        }
+
+        const { data: clientsData } = await supabase
+          .from('clients')
+          .select('id, first_name, last_name');
+        if (clientsData) {
+          setClients(clientsData as Client[]);
         }
       } catch (err) {
         console.error(err);
@@ -54,6 +66,8 @@ export default function TasksPage() {
       due_date: isRecurring ? null : dueDate,
       recurring_day: isRecurring ? recurringDay : null,
       tag,
+      district,
+      client_id: clientId || null,
     });
     setTasks((prev) => [...prev, task]);
     setTitle('');
@@ -61,6 +75,8 @@ export default function TasksPage() {
     setRecurringDay(1);
     setIsRecurring(false);
     setTag('other');
+    setDistrict('Центр');
+    setClientId('');
     setShowForm(false);
   };
 
@@ -115,15 +131,19 @@ export default function TasksPage() {
                 Регулярная
               </label>
               {isRecurring ? (
-                <input
-                  type="number"
-                  min={1}
-                  max={31}
-                  value={recurringDay}
-                  onChange={(e) => setRecurringDay(Number(e.target.value))}
-                  className="border px-2 py-1 rounded w-20"
-                  placeholder="День"
-                />
+                <label className="text-sm flex items-center gap-1">
+                  День
+                  <input
+                    type="number"
+                    min={1}
+                    max={31}
+                    value={recurringDay}
+                    onChange={(e) =>
+                      setRecurringDay(Number(e.target.value))
+                    }
+                    className="border px-2 py-1 rounded w-20"
+                  />
+                </label>
               ) : (
                 <input
                   type="date"
@@ -133,6 +153,27 @@ export default function TasksPage() {
                 />
               )}
             </div>
+            <select
+              className="border px-2 py-1 rounded w-full"
+              value={district}
+              onChange={(e) => setDistrict(e.target.value as District)}
+            >
+              <option value="Центр">Центр</option>
+              <option value="Джикджилли">Джикджилли</option>
+              <option value="Махмутлар">Махмутлар</option>
+            </select>
+            <select
+              className="border px-2 py-1 rounded w-full"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+            >
+              <option value="">Клиент</option>
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.first_name} {c.last_name ?? ''}
+                </option>
+              ))}
+            </select>
             <select
               className="border px-2 py-1 rounded w-full"
               value={tag}
@@ -152,6 +193,8 @@ export default function TasksPage() {
                   setRecurringDay(1);
                   setIsRecurring(false);
                   setTag('other');
+                  setDistrict('Центр');
+                  setClientId('');
                 }}
                 className="px-3 py-1 border rounded"
               >
@@ -186,6 +229,17 @@ export default function TasksPage() {
             {task.is_recurring && (
               <span className="text-xs bg-gray-200 px-2 py-0.5 rounded">
                 ежемес. {task.recurring_day}
+              </span>
+            )}
+            {task.district && (
+              <span className="text-xs bg-green-100 px-2 py-0.5 rounded">
+                {task.district}
+              </span>
+            )}
+            {task.client_id && (
+              <span className="text-xs bg-purple-100 px-2 py-0.5 rounded">
+                {clients.find((c) => c.id === task.client_id)?.first_name ||
+                  task.client_id}
               </span>
             )}
             <span className="ml-auto text-xs bg-blue-100 px-2 py-0.5 rounded">

@@ -1,3 +1,5 @@
+export type District = 'Центр' | 'Джикджилли' | 'Махмутлар';
+
 export type Client = {
   id: string;
   created_at: string;
@@ -11,8 +13,7 @@ export type Client = {
   gender: 'm' | 'f' | null;
   payment_status: 'pending' | 'active' | 'debt' | null;
   payment_method: 'cash' | 'transfer' | null;
-  district: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
-  user_id: string;
+  district: District | null;
 };
 
 export type AttendanceRecord = {
@@ -33,6 +34,8 @@ export type Task = {
   due_date: string | null;
   recurring_day: number | null;
   tag: TaskTag;
+  district: District | null;
+  client_id: string | null;
 };
 
 export const LEAD_SOURCES = [
