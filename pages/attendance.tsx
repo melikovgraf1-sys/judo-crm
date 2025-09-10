@@ -70,6 +70,7 @@ export default function AttendancePage() {
     } else {
       setGroups((p) => ({ ...p, [district]: [] }));
     }
+
     setLoading((p) => ({ ...p, [district]: false }));
   }
 

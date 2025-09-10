@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { DISTRICT_OPTIONS } from '../lib/districts'
 
 type Props = {
   onCreated?: () => void
 }
 
 export default function AddGroupForm({ onCreated }: Props) {
-  const [district, setDistrict] = useState('')
+  const [district, setDistrict] = useState<string>(DISTRICT_OPTIONS[0])
   const [ageBand, setAgeBand] = useState('')
   const [capacity, setCapacity] = useState<number | ''>('')
   const [loading, setLoading] = useState(false)
@@ -32,7 +33,7 @@ export default function AddGroupForm({ onCreated }: Props) {
       return
     }
     // очистим форму и обновим список
-    setDistrict('')
+    setDistrict(DISTRICT_OPTIONS[0])
     setAgeBand('')
     setCapacity('')
     onCreated?.()
@@ -41,12 +42,15 @@ export default function AddGroupForm({ onCreated }: Props) {
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto p-4 bg-white rounded-2xl shadow">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <input
+        <select
           className="border rounded-lg px-3 py-2"
-          placeholder="Район (например, Центр)"
           value={district}
           onChange={(e) => setDistrict(e.target.value)}
-        />
+        >
+          {DISTRICT_OPTIONS.map((d) => (
+            <option key={d} value={d}>{d}</option>
+          ))}
+        </select>
         <input
           className="border rounded-lg px-3 py-2"
           placeholder="Возраст (например, 4-6 лет)"
@@ -71,7 +75,7 @@ export default function AddGroupForm({ onCreated }: Props) {
           disabled={loading}
           className="px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
         >
-          {loading ? 'Добавляю…' : '+ Add Group'}
+          {loading ? 'Добавляю…' : '+ Добавить группу'}
         </button>
       </div>
     </form>
