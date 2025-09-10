@@ -21,7 +21,7 @@ export default function AppCRM() {
         <main className="max-w-6xl mx-auto p-4 md:p-6">
           <Routes>
             <Route path="/" element={<DashboardPage />} />
-            <Route path="/groups" element={<GroupsPage />} />
+            <Route path="/districts" element={<DistrictsPage />} />
             <Route path="/clients" element={<ClientsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFoundPage />} />
@@ -38,7 +38,7 @@ function TopNav() {
 
   const links = [
     { to: "/", label: "Главная", icon: <LayoutDashboard className="w-4 h-4" /> },
-    { to: "/groups", label: "Группы", icon: <Group className="w-4 h-4" /> },
+    { to: "/districts", label: "Районы", icon: <Group className="w-4 h-4" /> },
     { to: "/clients", label: "Клиенты", icon: <Users className="w-4 h-4" /> },
     { to: "/settings", label: "Настройки", icon: <Settings className="w-4 h-4" /> },
   ];
@@ -102,7 +102,7 @@ function DashboardPage() {
       <h1 className="text-2xl font-semibold">Добро пожаловать 👋</h1>
       <p className="text-gray-600">Здесь будет краткий обзор: количество групп, клиентов, ближайшие тренировки и задачи.</p>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPI title="Группы" value="7" />
+        <KPI title="Районы" value="7" />
         <KPI title="Клиенты" value="63" />
         <KPI title="Тренировки сегодня" value="3" />
         <KPI title="Задачи" value="5" />
@@ -120,7 +120,7 @@ function KPI({ title, value }: { title: string; value: string }) {
   );
 }
 
-function GroupsPage() {
+function DistrictsPage() {
   // Полноценный CRUD без поля «Название», как ты просил ранее
   type Group = { id: number; age: string; coach: string; loc: string };
 
@@ -177,7 +177,7 @@ function GroupsPage() {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Группы</h1>
+        <h1 className="text-2xl font-semibold">Районы</h1>
       </div>
 
       {/* Форма добавления */}

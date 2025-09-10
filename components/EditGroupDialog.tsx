@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import type { Group } from './GroupCard'
+import { DISTRICT_OPTIONS } from '../lib/districts'
 
 type Props = {
   initial: Group
@@ -34,12 +35,15 @@ export default function EditGroupDialog({ initial, onClose, onSaved }: Props) {
 
         <form onSubmit={submit} className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input
+            <select
               className="border rounded-lg px-3 py-2"
-              placeholder="Район"
               value={district}
               onChange={(e) => setDistrict(e.target.value)}
-            />
+            >
+              {DISTRICT_OPTIONS.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
             <input
               className="border rounded-lg px-3 py-2"
               placeholder="Возраст"
