@@ -11,7 +11,7 @@ export type Client = {
   gender: 'm' | 'f' | null;
   payment_status: 'pending' | 'active' | 'debt' | null;
   payment_method: 'cash' | 'transfer' | null;
-  district: 'Центр' | 'Махмутлар' | 'Джикджилли' | null;
+  district: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
 };
 
 export type Lead = {

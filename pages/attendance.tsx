@@ -46,7 +46,7 @@ export default function AttendancePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Attendance</h1>
+      <h1 className="text-2xl font-bold mb-4">Журнал посещений</h1>
       <div className="mb-4">
         <input
           type="date"
@@ -69,7 +69,7 @@ export default function AttendancePage() {
           </label>
         ))}
         {clients.length === 0 && (
-          <div className="text-gray-500">no clients</div>
+          <div className="text-gray-500">Клиентов нет</div>
         )}
       </div>
     </div>
