@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import type { Lead } from '../lib/types';
-import { LEAD_STAGES } from '../lib/leadStages';
+import { LEAD_STAGES } from '../lib/types';
 
 export default function LeadModal({
   initial,
