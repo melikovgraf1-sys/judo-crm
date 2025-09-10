@@ -80,13 +80,13 @@ export default function GroupCard({ group, onChanged, onAddClient, districts }: 
             className="px-3 py-1 rounded-lg bg-blue-600 text-white"
             onClick={(e) => { e.stopPropagation(); setEditing(true); }}
           >
-            Edit
+            Редактировать
           </button>
           <button
             className="px-3 py-1 rounded-lg bg-red-600/90 text-white"
             onClick={(e) => { e.stopPropagation(); handleDelete(); }}
           >
-            Delete
+            Удалить
           </button>
         </div>
       </div>
@@ -144,14 +144,14 @@ export default function GroupCard({ group, onChanged, onAddClient, districts }: 
           }}
           disabled={saving}
         >
-          Cancel
+          Отмена
         </button>
         <button
           className="px-3 py-2 rounded-lg bg-blue-600 text-white"
           onClick={handleSave}
           disabled={saving}
         >
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? 'Сохранение…' : 'Сохранить'}
         </button>
       </div>
     </div>

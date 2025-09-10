@@ -39,9 +39,9 @@ export type Task = {
 };
 
 export const LEAD_SOURCES = [
-  { key: 'instagram', title: 'Instagram' },
-  { key: 'whatsapp', title: 'WhatsApp' },
-  { key: 'telegram', title: 'Telegram' },
+  { key: 'instagram', title: 'Инстаграм' },
+  { key: 'whatsapp', title: 'Ватсап' },
+  { key: 'telegram', title: 'Телеграм' },
 ] as const;
 export type LeadSource = (typeof LEAD_SOURCES)[number]['key'];
 export const LEAD_SOURCE_TITLES: Record<LeadSource, string> = Object.fromEntries(

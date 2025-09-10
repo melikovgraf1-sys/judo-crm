@@ -104,7 +104,7 @@ export default function AttendancePage() {
             {openDistricts[d] && (
               <div className="p-4 space-y-4">
                 {loading[d] && (
-                  <div className="text-sm text-gray-500">loading…</div>
+                  <div className="text-sm text-gray-500">загрузка…</div>
                 )}
                 {!loading[d] &&
                   (groups[d] || []).map((g) => (

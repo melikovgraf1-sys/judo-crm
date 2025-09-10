@@ -27,34 +27,34 @@ export default function ClientsPage() {
   const openEdit = (c: Client) => { setEditing(c); setOpenModal(true); };
 
   const remove = async (id: string) => {
-    if (!confirm('Delete client?')) return;
+    if (!confirm('Удалить клиента?')) return;
     const { error } = await supabase.from('clients').delete().eq('id', id);
     if (error) alert(error.message); else loadData();
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Clients</h1>
+      <h1 className="text-2xl font-bold mb-4">Клиенты</h1>
       <div className="mb-4">
         <button
           onClick={openAdd}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          + Add Client
+          + Добавить клиента
         </button>
       </div>
-      {loading && <div className="text-gray-500">loading…</div>}
+      {loading && <div className="text-gray-500">загрузка…</div>}
       <div className="space-y-3">
         {clients.map((c) => (
           <ClientCard key={c.id} client={c} onEdit={openEdit} onDelete={remove}>
             <div>
-              <div className="text-xs uppercase text-gray-400 mb-1">Groups</div>
+              <div className="text-xs uppercase text-gray-400 mb-1">Группы</div>
               <ClientGroupPicker clientId={c.id} />
             </div>
           </ClientCard>
         ))}
         {!loading && clients.length === 0 && (
-          <div className="text-gray-500">no clients yet</div>
+          <div className="text-gray-500">клиентов пока нет</div>
         )}
       </div>
       {openModal && (
