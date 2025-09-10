@@ -49,7 +49,9 @@ export default function ClientModal({
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-4 w-full max-w-lg space-y-3">
-        <div className="text-lg font-semibold">{initial ? 'Edit client' : 'Add client'}</div>
+        <div className="text-lg font-semibold">
+          {initial ? 'Edit client' : 'Add client'}
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <input className="border rounded p-2 col-span-1" placeholder="Имя"
                  value={form.first_name ?? ''} onChange={e => set('first_name', e.target.value)} />

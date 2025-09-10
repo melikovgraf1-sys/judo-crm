@@ -3,25 +3,14 @@ import { supabase } from '../lib/supabaseClient';
 import type { Lead, LeadStage, LeadSource } from '../lib/types';
 import { LEAD_STAGES, LEAD_STAGE_TITLES } from '../lib/types';
 import LeadCard from '../components/LeadCard';
-import LeadForm from '../components/LeadForm';
-
-type StageMap = Record<LeadStage, Lead[]>;
-
-function emptyStageMap(): StageMap {
-  return LEAD_STAGES.reduce((acc, s) => {
-    acc[s.key] = [];
-    return acc;
-  }, {} as StageMap);
-}
+import LeadModal from '../components/LeadModal';
+import { LEAD_STAGES } from '../lib/leadStages';
 
 export default function LeadsPage() {
-  const [leads, setLeads] = useState<StageMap>(emptyStageMap());
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
+  const [editing, setEditing] = useState<Lead | null>(null);
 
   async function loadData() {
     setLoading(true);
@@ -74,10 +63,19 @@ export default function LeadsPage() {
     }
   }
 
+  const openAdd = () => { setEditing(null); setOpenModal(true); };
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Leads</h1>
-      <LeadForm onAdd={addLead} />
+      <div className="mb-4">
+        <button
+          onClick={openAdd}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          + Add Lead
+        </button>
+      </div>
       {loading && <div className="text-gray-500">loading…</div>}
       <div className="flex gap-4 overflow-x-auto">
         {LEAD_STAGES.map((stage) => (
@@ -89,6 +87,13 @@ export default function LeadsPage() {
           </div>
         ))}
       </div>
+      {openModal && (
+        <LeadModal
+          initial={editing}
+          onClose={() => setOpenModal(false)}
+          onSaved={() => { setOpenModal(false); loadData(); }}
+        />
+      )}
     </div>
   );
 }
