@@ -13,7 +13,7 @@ export type Client = {
   gender: 'm' | 'f' | null;
   payment_status: 'pending' | 'active' | 'debt' | null;
   payment_method: 'cash' | 'transfer' | null;
-  district: District | null;
+  district: string | null;
 };
 
 export type AttendanceRecord = {

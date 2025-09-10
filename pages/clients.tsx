@@ -43,7 +43,7 @@ export default function ClientsPage() {
           + Добавить клиента
         </button>
       </div>
-      {loading && <div className="text-gray-500">загрузка…</div>}
+      {loading && <div className="text-gray-500">Загрузка…</div>}
       <div className="space-y-3">
         {clients.map((c) => (
           <ClientCard key={c.id} client={c} onEdit={openEdit} onDelete={remove}>
@@ -54,7 +54,7 @@ export default function ClientsPage() {
           </ClientCard>
         ))}
         {!loading && clients.length === 0 && (
-          <div className="text-gray-500">клиентов пока нет</div>
+          <div className="text-gray-500">Клиентов нет</div>
         )}
       </div>
       {openModal && (

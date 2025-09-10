@@ -34,7 +34,7 @@ export default function DistrictsPage() {
 
   return (
     <main className="min-h-screen bg-gray-100">
-      <h1 className="text-4xl font-bold text-blue-600 text-center pt-10">Дзюдо CRM</h1>
+      <h1 className="text-4xl font-bold text-blue-600 text-center pt-10">Районы</h1>
 
       {/* Панель действий */}
       <div className="max-w-3xl mx-auto px-4 mt-6">

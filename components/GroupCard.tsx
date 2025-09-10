@@ -151,7 +151,7 @@ export default function GroupCard({ group, onChanged, onAddClient, districts }: 
           onClick={handleSave}
           disabled={saving}
         >
-          {saving ? 'Сохранение…' : 'Сохранить'}
+          {saving ? 'Сохраняю…' : 'Сохранить'}
         </button>
       </div>
     </div>

@@ -61,7 +61,7 @@ export default function LeadModal({
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-4 w-full max-w-lg space-y-3">
-        <div className="text-lg font-semibold">{initial ? 'Редактировать заявку' : 'Добавить заявку'}</div>
+        <div className="text-lg font-semibold">{initial ? 'Редактировать лид' : 'Добавить лид'}</div>
         <div className="grid grid-cols-2 gap-3">
           <input className="border rounded p-2 col-span-2" placeholder="Имя"
                  value={form.name ?? ''} onChange={e => set('name', e.target.value)} />

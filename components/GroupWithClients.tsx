@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import GroupCard, { Group } from './GroupCard';
-import type { Client, District } from '../lib/types';
+import type { Client } from '../lib/types';
 import ClientModal from './ClientModal';
 
 type Props = {
@@ -49,9 +49,9 @@ export default function GroupWithClients({ group, onChanged, districts }: Props)
       </button>
       {open && (
         <div className="pl-4 space-y-1">
-          {loading && <div className="text-sm text-gray-500">загрузка…</div>}
+          {loading && <div className="text-sm text-gray-500">Загрузка…</div>}
           {!loading && clients.length === 0 && (
-            <div className="text-sm text-gray-500">нет клиентов</div>
+            <div className="text-sm text-gray-500">Клиентов нет</div>
           )}
           {clients.map((c) => (
             <div key={c.id} className="text-sm">
@@ -63,7 +63,7 @@ export default function GroupWithClients({ group, onChanged, districts }: Props)
       )}
       {openClient && (
         <ClientModal
-          initial={{ district: group.district as District }}
+          initial={{ district: group.district }}
           onClose={() => setOpenClient(false)}
           onSaved={(c) => { if (c) setClients((prev) => [...prev, c]); setOpenClient(false); }}
           groupId={group.id}

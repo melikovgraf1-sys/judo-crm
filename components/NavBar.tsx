@@ -21,10 +21,10 @@ export default function NavBar() {
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold text-blue-700">Дзюдо CRM</Link>
         <nav className="flex gap-2">
-          <NavLink href="/">Панель</NavLink>
+          <NavLink href="/">Главная</NavLink>
           <NavLink href="/districts">Районы</NavLink>
           <NavLink href="/clients">Клиенты</NavLink>
-          <NavLink href="/leads">Заявки</NavLink>
+          <NavLink href="/leads">Лиды</NavLink>
           <NavLink href="/payments">Платежи</NavLink>
           <NavLink href="/tasks">Задачи</NavLink>
           <NavLink href="/attendance">Журнал посещений</NavLink>
