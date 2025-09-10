@@ -23,6 +23,7 @@ export type Lead = {
   stage: 'queue' | 'hold' | 'trial' | 'awaiting_payment' | 'paid' | 'canceled';
 };
 
+
 export type AttendanceRecord = {
   id: string;
   client_id: string;
