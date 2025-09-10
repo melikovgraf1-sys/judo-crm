@@ -136,7 +136,7 @@ export default function LeadsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Лиды</h1>
-      <LeadForm onAdd={addLead} />
+      <LeadForm onAdd={addLead} onError={setErrorMsg} />
       {errorMsg && <div className="text-red-600 mb-2">{errorMsg}</div>}
       {loading && <div className="text-gray-500">Загрузка…</div>}
       <div className="flex gap-4 overflow-x-auto">
@@ -161,10 +161,18 @@ export default function LeadsPage() {
         <LeadModal
           initial={editing}
           onClose={() => setEditing(null)}
-          onSaved={() => {
+          onSaved={(lead) => {
             setEditing(null);
-            loadData();
+            setLeads((prev) => {
+              const updated: StageMap = emptyStageMap();
+              for (const s of LEAD_STAGES) {
+                updated[s.key] = prev[s.key].filter((l) => l.id !== lead.id);
+              }
+              updated[lead.stage].unshift(lead);
+              return updated;
+            });
           }}
+          onError={(msg) => setErrorMsg(msg)}
         />
       )}
     </div>

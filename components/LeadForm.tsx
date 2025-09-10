@@ -8,6 +8,7 @@ type Group = { id: string; district: string; age_band: string; name?: string | n
 
 export default function LeadForm({
   onAdd,
+  onError,
 }: {
   onAdd: (data: {
     name: string;
@@ -17,6 +18,7 @@ export default function LeadForm({
     district: District | null;
     group_id: string | null;
   }) => Promise<void>;
+  onError: (msg: string) => void;
 }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -32,9 +34,14 @@ export default function LeadForm({
         .from('groups')
         .select('id, district, age_band, name')
         .order('district', { ascending: true });
-      if (!error && data) setGroups(data);
+      if (error) {
+        console.error(error);
+        onError(error.message);
+        return;
+      }
+      if (data) setGroups(data);
     })();
-  }, []);
+  }, [onError]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

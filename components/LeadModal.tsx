@@ -14,10 +14,12 @@ export default function LeadModal({
   initial,
   onClose,
   onSaved,
+  onError,
 }: {
   initial?: Lead | null;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (lead: Lead) => void;
+  onError: (msg: string) => void;
 }) {
   const [form, setForm] = useState<Partial<Lead>>({});
   const [groups, setGroups] = useState<Group[]>([]);
@@ -29,9 +31,14 @@ export default function LeadModal({
         .from('groups')
         .select('id, district, age_band, name')
         .order('district', { ascending: true });
-      if (!error) setGroups(data || []);
+      if (error) {
+        console.error(error);
+        onError(error.message);
+        return;
+      }
+      setGroups(data || []);
     })();
-  }, []);
+  }, [onError]);
 
   const set = (k: keyof Lead, v: Lead[keyof Lead]) =>
     setForm((s) => ({ ...s, [k]: v }));
@@ -58,23 +65,30 @@ export default function LeadModal({
       ...(form.group_id ? { group_id: form.group_id } : {}),
     };
 
+    let data;
     let error;
     const attempt = async (payload: Record<string, unknown>) => {
       if (initial?.id) {
-        return supabase.from('leads').update(payload).eq('id', initial.id);
+        return supabase
+          .from('leads')
+          .update(payload)
+          .eq('id', initial.id)
+          .select('*')
+          .single();
       }
-      return supabase.from('leads').insert(payload);
+      return supabase.from('leads').insert(payload).select('*').single();
     };
 
-    ({ error } = await attempt({ ...base, ...optional }));
+    ({ data, error } = await attempt({ ...base, ...optional }));
     if (error && /column/.test(error.message)) {
-      ({ error } = await attempt(base));
+      ({ data, error } = await attempt(base));
     }
     if (error) {
-      alert(error.message);
+      console.error(error);
+      onError(error.message);
       return;
     }
-    onSaved();
+    onSaved(data as Lead);
   };
 
   return (
