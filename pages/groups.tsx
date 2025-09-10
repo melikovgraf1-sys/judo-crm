@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import GroupCard, { Group } from '../components/GroupCard';
 import AddGroupModal from '../components/AddGroupModal';
+import GroupWithClients from '../components/GroupWithClients';
+import { Group } from '../components/GroupCard';
+
+const DISTRICTS = ['Центр', 'Джикджилли', 'Махмутлар'];
 
 export default function Home() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [openAdd, setOpenAdd] = useState(false);
+  const [openDistricts, setOpenDistricts] = useState<Record<string, boolean>>({});
 
   async function loadData() {
     const { data, error } = await supabase
@@ -15,6 +19,10 @@ export default function Home() {
     if (!error && data) setGroups(data as Group[]);
   }
   useEffect(() => { loadData(); }, []);
+
+  const toggleDistrict = (d: string) => {
+    setOpenDistricts((prev) => ({ ...prev, [d]: !prev[d] }));
+  };
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -30,10 +38,26 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Список групп */}
-      <div className="mt-6 space-y-3 max-w-3xl mx-auto px-4 pb-10">
-        {groups.map((g) => (
-          <GroupCard key={g.id} group={g} onChanged={loadData} />
+      {/* Список групп по районам */}
+      <div className="mt-6 space-y-4 max-w-3xl mx-auto px-4 pb-10">
+        {DISTRICTS.map((d) => (
+          <div key={d} className="border rounded-xl bg-white/70 shadow">
+            <button
+              className="w-full text-left px-4 py-2 font-semibold"
+              onClick={() => toggleDistrict(d)}
+            >
+              {d}
+            </button>
+            {openDistricts[d] && (
+              <div className="p-4 space-y-3">
+                {groups
+                  .filter((g) => g.district === d)
+                  .map((g) => (
+                    <GroupWithClients key={g.id} group={g} onChanged={loadData} />
+                  ))}
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
