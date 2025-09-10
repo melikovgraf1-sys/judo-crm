@@ -7,6 +7,7 @@ type Payment = { id: string; client_id: string };
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState('');
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     async function loadFromPayments() {
@@ -20,14 +21,16 @@ export default function TasksPage() {
           completed: false,
           payment_id: p.id,
         }));
-        setTasks(paymentTasks);
+        setTasks((prev) => [...prev, ...paymentTasks]);
       }
     }
     loadFromPayments();
   }, []);
 
   const addTask = () => {
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      return;
+    }
     const newTask: Task = {
       id: `manual-${Date.now()}`,
       title: title.trim(),
@@ -36,6 +39,7 @@ export default function TasksPage() {
     };
     setTasks((prev) => [...prev, newTask]);
     setTitle('');
+    setShowForm(false);
   };
 
   const toggle = (id: string) => {
@@ -49,21 +53,45 @@ export default function TasksPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Tasks</h1>
-      <div className="flex gap-2 mb-4">
-        <input
-          type="text"
-          className="border px-2 py-1 rounded flex-1"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="New task..."
-        />
+      <div className="mb-4">
         <button
-          onClick={addTask}
+          onClick={() => setShowForm(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + Add Task
         </button>
       </div>
+      {showForm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-4 rounded space-y-2 w-80">
+            <input
+              type="text"
+              className="border px-2 py-1 rounded w-full"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Task title"
+              autoFocus
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setShowForm(false);
+                  setTitle('');
+                }}
+                className="px-3 py-1 border rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={addTask}
+                className="bg-blue-600 text-white px-3 py-1 rounded"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <ul className="space-y-2">
         {tasks.map((task) => (
           <li key={task.id} className="flex items-center">
