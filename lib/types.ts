@@ -1,3 +1,5 @@
+export type District = 'Центр' | 'Джикджилли' | 'Махмутлар';
+
 export type Client = {
   id: string;
   created_at: string;
@@ -11,7 +13,7 @@ export type Client = {
   gender: 'm' | 'f' | null;
   payment_status: 'pending' | 'active' | 'debt' | null;
   payment_method: 'cash' | 'transfer' | null;
-  district: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
+  district: District | null;
 };
 
 export type AttendanceRecord = {
@@ -21,11 +23,28 @@ export type AttendanceRecord = {
   present: boolean;
 };
 
+export type TaskTag = 'rent' | 'payment' | 'birthday' | 'other';
+
+export const TASK_TAG_TITLES: Record<TaskTag, string> = {
+  rent: 'Аренда',
+  payment: 'Платеж',
+  birthday: 'День рождения',
+  other: 'Другое',
+};
+
+export type RecurrenceInterval = 'weekly' | 'monthly' | 'yearly';
+
 export type Task = {
   id: string;
   title: string;
   completed: boolean;
   payment_id: string | null;
+  is_recurring: boolean;
+  due_date: string | null;
+  recurring_interval: RecurrenceInterval | null;
+  tag: TaskTag;
+  district: District | null;
+  client_id: string | null;
 };
 
 export const LEAD_SOURCES = [
