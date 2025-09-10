@@ -27,7 +27,7 @@ export default function ClientModal({
     // валидация минимальная
     if (!form.first_name) { alert('Введите имя'); return; }
 
-    const payload = {
+    const basePayload = {
       first_name: form.first_name,
       last_name: form.last_name ?? null,
       phone: form.phone ?? null,
@@ -44,7 +44,10 @@ export default function ClientModal({
     let error;
     let data;
     if (initial?.id) {
-      ({ error } = await supabase.from('clients').update(payload).eq('id', initial.id));
+      ({ error } = await supabase
+        .from('clients')
+        .update(basePayload)
+        .eq('id', initial.id));
     } else {
       ({ data, error } = await supabase.from('clients').insert(payload).select().single());
       if (!error && groupId && data) {

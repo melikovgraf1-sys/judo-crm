@@ -4,10 +4,9 @@ import {
   LEAD_STAGES,
   type Lead,
   type LeadStage,
-  type LeadSource,
 } from '../lib/types';
 import LeadCard from '../components/LeadCard';
-import LeadForm from '../components/LeadForm';
+import LeadModal from '../components/LeadModal';
 
 type StageMap = Record<LeadStage, Lead[]>;
 
@@ -21,6 +20,7 @@ function emptyStageMap(): StageMap {
 export default function LeadsPage() {
   const [leads, setLeads] = useState<StageMap>(emptyStageMap());
   const [loading, setLoading] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -30,7 +30,7 @@ export default function LeadsPage() {
     setLoading(true);
     const { data, error } = await supabase
       .from('leads')
-      .select('id, created_at, name, phone, source, stage')
+      .select('id, created_at, name, phone, source, stage, birth_date, district, group_id')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -45,15 +45,6 @@ export default function LeadsPage() {
     }
     setLeads(grouped);
     setLoading(false);
-  }
-
-  async function addLead(data: { name: string; phone: string | null; source: LeadSource }) {
-    const { error } = await supabase.from('leads').insert({ ...data, stage: 'queue' });
-    if (error) {
-      console.error(error);
-      return;
-    }
-    await loadData();
   }
 
   async function changeStage(id: number, stage: LeadStage) {
@@ -92,6 +83,15 @@ export default function LeadsPage() {
           </div>
         ))}
       </div>
+      {openModal && (
+        <LeadModal
+          onClose={() => setOpenModal(false)}
+          onSaved={() => {
+            setOpenModal(false);
+            loadData();
+          }}
+        />
+      )}
     </div>
   );
 }

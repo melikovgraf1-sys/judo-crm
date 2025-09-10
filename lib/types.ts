@@ -1,3 +1,5 @@
+export type District = 'Центр' | 'Джикджилли' | 'Махмутлар';
+
 export type Client = {
   id: string;
   created_at: string;
@@ -21,17 +23,25 @@ export type AttendanceRecord = {
   present: boolean;
 };
 
+export type TaskTag = 'rent' | 'payment' | 'birthday' | 'other';
+
 export type Task = {
   id: string;
   title: string;
   completed: boolean;
   payment_id: string | null;
+  is_recurring: boolean;
+  due_date: string | null;
+  recurring_day: number | null;
+  tag: TaskTag;
+  district: District | null;
+  client_id: string | null;
 };
 
 export const LEAD_SOURCES = [
-  { key: 'instagram', title: 'Instagram' },
-  { key: 'whatsapp', title: 'WhatsApp' },
-  { key: 'telegram', title: 'Telegram' },
+  { key: 'instagram', title: 'Инстаграм' },
+  { key: 'whatsapp', title: 'Ватсап' },
+  { key: 'telegram', title: 'Телеграм' },
 ] as const;
 export type LeadSource = (typeof LEAD_SOURCES)[number]['key'];
 export const LEAD_SOURCE_TITLES: Record<LeadSource, string> = Object.fromEntries(
@@ -59,4 +69,7 @@ export type Lead = {
   phone: string | null;
   source: LeadSource;
   stage: LeadStage;
+  birth_date: string | null;
+  district: 'Центр' | 'Джикджилли' | 'Махмутлар' | null;
+  group_id: string | null;
 };

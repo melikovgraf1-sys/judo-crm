@@ -25,7 +25,7 @@ export default function LeadCard({ lead, onStageChange, className }: LeadCardPro
           {createdLabel && <div className="text-xs text-gray-400">{createdLabel}</div>}
         </div>
         <Link href={`/leads/${lead.id}`} className="text-xs text-blue-500">
-          Открыть
+          Подробнее
         </Link>
       </div>
       <select
