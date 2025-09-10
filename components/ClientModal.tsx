@@ -44,15 +44,14 @@ export default function ClientModal({
     let error;
     let data;
     if (initial?.id) {
-      ({ error } = await supabase.from('clients').update(payload).eq('id', initial.id));
+      ({ error } = await supabase
+        .from('clients')
+        .update(payload, { returning: 'minimal' })
+        .eq('id', initial.id));
     } else {
-      ({ data, error } = await supabase.from('clients').insert(payload).select().single());
-      if (!error && groupId && data) {
-        const { error: cgError } = await supabase
-          .from('client_groups')
-          .insert({ client_id: data.id, group_id: groupId });
-        if (cgError) { alert(cgError.message); return; }
-      }
+      ({ error } = await supabase
+        .from('clients')
+        .insert(payload, { returning: 'minimal' }));
     }
     if (error) { alert(error.message); return; }
     onSaved(data as Client | undefined);
