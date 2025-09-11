@@ -112,7 +112,7 @@ export default function LeadsPage() {
           </div>
         ))}
       </div>
-      {openModal && (
+      {editing && (
         <LeadModal
           initial={editing}
           onClose={() => {
@@ -126,6 +126,7 @@ export default function LeadsPage() {
               loadData();
               return;
             }
+
             setLeads((prev) => {
               const updated: StageMap = emptyStageMap();
               for (const s of LEAD_STAGES) {
