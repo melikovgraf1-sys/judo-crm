@@ -126,7 +126,6 @@ export default function LeadsPage() {
               loadData();
               return;
             }
-
             setLeads((prev) => {
               const updated: StageMap = emptyStageMap();
               for (const s of LEAD_STAGES) {

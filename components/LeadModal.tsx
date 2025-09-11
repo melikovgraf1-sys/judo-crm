@@ -48,15 +48,11 @@ export default function LeadModal({
       alert('Введите имя');
       return;
     }
-    if (!form.source) {
-      alert('Выберите источник');
-      return;
-    }
 
     const base = {
       name: form.name,
       phone: form.phone ?? null,
-      source: form.source,
+      source: (form.source as Lead['source']) ?? 'telegram',
       stage: (form.stage as Lead['stage']) ?? 'queue',
     };
     const optional = {
