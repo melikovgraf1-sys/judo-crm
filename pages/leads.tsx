@@ -1,15 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import {
-  LEAD_STAGES,
-  type Lead,
-  type LeadStage,
-  type LeadSource,
-  type District,
-} from '../lib/types';
+import { LEAD_STAGES, type Lead, type LeadStage } from '../lib/types';
 import LeadCard from '../components/LeadCard';
 import LeadModal from '../components/LeadModal';
-import LeadForm from '../components/LeadForm';
 
 type StageMap = Record<LeadStage, Lead[]>;
 
@@ -25,6 +18,7 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [editing, setEditing] = useState<Lead | null>(null);
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -75,68 +69,22 @@ export default function LeadsPage() {
     }
   }
 
-  async function addLead({
-    name,
-    phone,
-    source,
-    birth_date,
-    district,
-    group_id,
-  }: {
-    name: string;
-    phone: string | null;
-    source: LeadSource;
-    birth_date: string | null;
-    district: District | null;
-    group_id: string | null;
-  }) {
-    setErrorMsg(null);
-    const base = { name, phone, source, stage: 'queue' as const };
-    const optional = {
-      ...(birth_date ? { birth_date } : {}),
-      ...(district ? { district } : {}),
-      ...(group_id ? { group_id } : {}),
-    };
-
-    let data;
-    let error;
-    ({ data, error } = await supabase
-      .from('leads')
-      .insert({ ...base, ...optional })
-      .select('*')
-      .single());
-
-    if (error && /column/.test(error.message)) {
-      ({ data, error } = await supabase
-        .from('leads')
-        .insert(base)
-        .select('*')
-        .single());
-    }
-
-    if (error) {
-      console.error(error);
-      setErrorMsg(error.message);
-      await loadData();
-      return;
-    }
-
-    if (data) {
-      setLeads((prev) => ({
-        ...prev,
-        queue: [data as Lead, ...prev.queue],
-      }));
-      return;
-    }
-
-    // If Supabase didn't return the inserted row, reload the list
-    await loadData();
-  }
+  const openAdd = () => {
+    setEditing(null);
+    setOpenModal(true);
+  };
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Лиды</h1>
-      <LeadForm onAdd={addLead} onError={setErrorMsg} />
+      <div className="mb-4">
+        <button
+          onClick={openAdd}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          + Добавить лида
+        </button>
+      </div>
       {errorMsg && <div className="text-red-600 mb-2">{errorMsg}</div>}
       {loading && <div className="text-gray-500">Загрузка…</div>}
       <div className="flex gap-4 overflow-x-auto">
@@ -152,7 +100,14 @@ export default function LeadsPage() {
           >
             <h2 className="text-center font-semibold mb-2">{stage.title}</h2>
             {leads[stage.key].map((l) => (
-              <LeadCard key={l.id} lead={l} onOpen={(lead) => setEditing(lead)} />
+              <LeadCard
+                key={l.id}
+                lead={l}
+                onOpen={(lead) => {
+                  setEditing(lead);
+                  setOpenModal(true);
+                }}
+              />
             ))}
           </div>
         ))}
@@ -160,9 +115,18 @@ export default function LeadsPage() {
       {editing && (
         <LeadModal
           initial={editing}
-          onClose={() => setEditing(null)}
-          onSaved={(lead) => {
+          onClose={() => {
+            setOpenModal(false);
             setEditing(null);
+          }}
+          onSaved={(lead) => {
+            setOpenModal(false);
+            setEditing(null);
+            if (!lead.id) {
+              loadData();
+              return;
+            }
+
             setLeads((prev) => {
               const updated: StageMap = emptyStageMap();
               for (const s of LEAD_STAGES) {
