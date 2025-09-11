@@ -48,22 +48,31 @@ export default function AttendancePage() {
 
   async function loadDistrict(district: string) {
     setLoading((p) => ({ ...p, [district]: true }));
-    const { data, error } = await supabase
+    const { data: groupData, error } = await supabase
       .from('groups')
-      .select(
-        'id, age_band, schedule, client_groups(client:clients(id, first_name, last_name))'
-      )
+      .select('id, age_band, schedule')
       .eq('district', district)
       .order('age_band', { ascending: true })
       .order('schedule', { ascending: true })
-      .returns<(Group & { client_groups: { client: Client }[] })[]>();
+      .returns<Group[]>();
 
-    if (!error && data) {
-      const result: GroupData[] = data.map((g) => ({
-        id: g.id,
-        age_band: g.age_band,
-        schedule: g.schedule,
-        clients: (g.client_groups || []).map((cg) => cg.client),
+    if (!error && groupData) {
+      const ids = groupData.map((g) => g.id);
+      const { data: clientData } = await supabase
+        .from('client_groups')
+        .select('group_id, client:clients(id, first_name, last_name)')
+        .in('group_id', ids.length ? ids : ['-'])
+        .returns<{ group_id: string; client: Client }[]>();
+
+      const clientMap: Record<string, Client[]> = {};
+      (clientData || []).forEach((cg) => {
+        if (!clientMap[cg.group_id]) clientMap[cg.group_id] = [];
+        clientMap[cg.group_id].push(cg.client);
+      });
+
+      const result: GroupData[] = groupData.map((g) => ({
+        ...g,
+        clients: clientMap[g.id] || [],
       }));
       setGroups((p) => ({ ...p, [district]: result }));
     } else {
