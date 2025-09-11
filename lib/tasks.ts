@@ -10,7 +10,7 @@ export async function fetchTasks(): Promise<Task[]> {
 export async function createTask(task: Omit<Task, 'id'>): Promise<Task> {
   const { data, error } = await supabase
     .from('tasks')
-    .insert(task)
+    .insert([task])
     .select()
     .single();
   if (error) throw error;
