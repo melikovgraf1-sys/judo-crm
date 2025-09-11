@@ -82,7 +82,6 @@ export default function LeadModal({
     if (error) {
       console.error(error);
       onError(error.message);
-      return;
     }
 
     const fallback = { ...(initial ?? {}), ...base, ...optional } as Lead;
