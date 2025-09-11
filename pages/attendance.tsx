@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Client, AttendanceRecord } from '../lib/types';
+import { DISTRICT_OPTIONS } from '../lib/districts';
 
 type Group = {
   id: string;
@@ -10,8 +11,6 @@ type Group = {
 };
 
 type GroupData = Group & { clients: Client[] };
-
-const DISTRICTS = ['Центр', 'Джикджилли', 'Махмутлар'];
 
 export default function AttendancePage() {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -93,7 +92,7 @@ export default function AttendancePage() {
         />
       </div>
       <div className="space-y-4">
-        {DISTRICTS.map((d) => (
+        {DISTRICT_OPTIONS.map((d) => (
           <div key={d} className="border rounded-xl bg-white/70 shadow">
             <button
               className="w-full text-left px-4 py-2 font-semibold"
