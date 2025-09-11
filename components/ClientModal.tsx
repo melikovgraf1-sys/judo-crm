@@ -56,14 +56,21 @@ export default function ClientModal({
     };
 
     let error;
-    let data;
+    let data: Client | null = null;
     if (initial?.id) {
       ({ error } = await supabase
         .from('clients')
         .update(basePayload)
         .eq('id', initial.id));
+      if (!error) {
+        data = { ...(initial as Client), ...basePayload } as Client;
+      }
     } else {
-      ({ data, error } = await supabase.from('clients').insert(basePayload).select().single());
+      ({ data, error } = await supabase
+        .from('clients')
+        .insert(basePayload)
+        .select()
+        .single());
       if (!error && groupId && data) {
         const { error: cgError } = await supabase
           .from('client_groups')
@@ -72,7 +79,7 @@ export default function ClientModal({
       }
     }
     if (error) { setToast(error.message); return; }
-    onSaved(data as Client | undefined);
+    onSaved(data ?? undefined);
   };
 
   return (
