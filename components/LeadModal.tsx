@@ -14,10 +14,12 @@ export default function LeadModal({
   initial,
   onClose,
   onSaved,
+  onError,
 }: {
   initial?: Lead | null;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (lead: Lead) => void;
+  onError: (msg: string) => void;
 }) {
   const [form, setForm] = useState<Partial<Lead>>({});
   const [groups, setGroups] = useState<Group[]>([]);
@@ -29,33 +31,61 @@ export default function LeadModal({
         .from('groups')
         .select('id, district, age_band, name')
         .order('district', { ascending: true });
-      if (!error) setGroups(data || []);
+      if (error) {
+        console.error(error);
+        onError(error.message);
+        return;
+      }
+      setGroups(data || []);
     })();
-  }, []);
+  }, [onError]);
 
   const set = (k: keyof Lead, v: Lead[keyof Lead]) =>
     setForm((s) => ({ ...s, [k]: v }));
 
   const save = async () => {
-    if (!form.name) { alert('Введите имя'); return; }
-    if (!form.source) { alert('Выберите источник'); return; }
-    const payload = {
+    if (!form.name) {
+      alert('Введите имя');
+      return;
+    }
+
+    const base = {
       name: form.name,
       phone: form.phone ?? null,
-      source: form.source,
+      source: (form.source as Lead['source']) ?? 'telegram',
       stage: (form.stage as Lead['stage']) ?? 'queue',
-      birth_date: form.birth_date ?? null,
-      district: form.district ?? null,
-      group_id: form.group_id ?? null,
     };
+    const optional = {
+      ...(form.birth_date ? { birth_date: form.birth_date } : {}),
+      ...(form.district ? { district: form.district } : {}),
+      ...(form.group_id ? { group_id: form.group_id } : {}),
+    };
+
+    let data;
     let error;
-    if (initial?.id) {
-      ({ error } = await supabase.from('leads').update(payload).eq('id', initial.id));
-    } else {
-      ({ error } = await supabase.from('leads').insert(payload));
+    const attempt = async (payload: Record<string, unknown>) => {
+      const query = initial?.id
+        ? supabase
+            .from('leads')
+            .update(payload)
+            .eq('id', initial.id)
+            .select('*')
+        : supabase.from('leads').insert(payload).select('*');
+      const { data: rows, error } = await query;
+      return { data: (rows as Lead[] | null)?.[0] ?? null, error };
+    };
+
+    ({ data, error } = await attempt({ ...base, ...optional }));
+    if (error && /column/.test(error.message)) {
+      ({ data, error } = await attempt(base));
     }
-    if (error) { alert(error.message); return; }
-    onSaved();
+    if (error) {
+      console.error(error);
+      onError(error.message);
+    }
+
+    const fallback = { ...(initial ?? {}), ...base, ...optional } as Lead;
+    onSaved((data as Lead) ?? fallback);
   };
 
   return (
