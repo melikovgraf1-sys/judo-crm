@@ -113,7 +113,7 @@ export default function LeadsPage() {
           </div>
         ))}
       </div>
-      {openModal && (
+      {editing && (
         <LeadModal
           initial={editing}
           onClose={() => {

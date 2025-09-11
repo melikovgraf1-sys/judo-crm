@@ -72,26 +72,30 @@ export default function TasksPage() {
     if (!title.trim()) {
       return;
     }
-    const task = await createTask({
-      title: title.trim(),
-      completed: false,
-      payment_id: null,
-      is_recurring: isRecurring,
-      due_date: dueDate || null,
-      recurring_interval: isRecurring ? recurringInterval : null,
-      tag,
-      district,
-      client_id: clientId || null,
-    });
-    setTasks((prev) => [...prev, task]);
-    setTitle('');
-    setDueDate('');
-    setRecurringInterval('monthly');
-    setIsRecurring(false);
-    setTag('other');
-    setDistrict('Центр');
-    setClientId('');
-    setShowForm(false);
+    try {
+      const task = await createTask({
+        title: title.trim(),
+        completed: false,
+        payment_id: null,
+        is_recurring: isRecurring,
+        due_date: dueDate || null,
+        recurring_interval: isRecurring ? recurringInterval : null,
+        tag,
+        district,
+        client_id: clientId || null,
+      });
+      setTasks((prev) => [...prev, task]);
+      setTitle('');
+      setDueDate('');
+      setRecurringInterval('monthly');
+      setIsRecurring(false);
+      setTag('other');
+      setDistrict('Центр');
+      setClientId('');
+      setShowForm(false);
+    } catch (e) {
+      alert((e as Error).message);
+    }
   };
 
   const toggle = async (id: string) => {
