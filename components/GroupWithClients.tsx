@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import GroupCard, { Group } from './GroupCard';
-import type { Client } from '../lib/types';
+import type { Client, District } from '../lib/types';
 import ClientModal from './ClientModal';
 
 type Props = {
@@ -63,7 +63,7 @@ export default function GroupWithClients({ group, onChanged, districts }: Props)
       )}
       {openClient && (
         <ClientModal
-          initial={{ district: group.district }}
+          initial={{ district: group.district as District }}
           onClose={() => setOpenClient(false)}
           onSaved={(c) => { if (c) setClients((prev) => [...prev, c]); setOpenClient(false); }}
           groupId={group.id}
