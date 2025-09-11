@@ -68,15 +68,15 @@ export default function LeadModal({
     let data;
     let error;
     const attempt = async (payload: Record<string, unknown>) => {
-      if (initial?.id) {
-        return supabase
-          .from('leads')
-          .update(payload)
-          .eq('id', initial.id)
-          .select('*')
-          .single();
-      }
-      return supabase.from('leads').insert(payload).select('*').single();
+      const query = initial?.id
+        ? supabase
+            .from('leads')
+            .update(payload)
+            .eq('id', initial.id)
+            .select('*')
+        : supabase.from('leads').insert(payload).select('*');
+      const { data: rows, error } = await query;
+      return { data: (rows as Lead[] | null)?.[0] ?? null, error };
     };
 
     ({ data, error } = await attempt({ ...base, ...optional }));
@@ -88,7 +88,9 @@ export default function LeadModal({
       onError(error.message);
       return;
     }
-    onSaved(data as Lead);
+
+    const fallback = { ...(initial ?? {}), ...base, ...optional } as Lead;
+    onSaved((data as Lead) ?? fallback);
   };
 
   return (
