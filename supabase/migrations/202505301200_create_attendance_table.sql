@@ -46,5 +46,6 @@ exception
   when duplicate_object then null;
 end $$;
 
+
 -- Refresh PostgREST schema cache so new table/columns are recognized
 notify pgrst, 'reload schema';

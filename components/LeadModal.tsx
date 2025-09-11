@@ -48,15 +48,11 @@ export default function LeadModal({
       alert('Введите имя');
       return;
     }
-    if (!form.source) {
-      alert('Выберите источник');
-      return;
-    }
 
     const base = {
       name: form.name,
       phone: form.phone ?? null,
-      source: form.source,
+      source: (form.source as Lead['source']) ?? 'telegram',
       stage: (form.stage as Lead['stage']) ?? 'queue',
     };
     const optional = {
@@ -68,15 +64,15 @@ export default function LeadModal({
     let data;
     let error;
     const attempt = async (payload: Record<string, unknown>) => {
-      if (initial?.id) {
-        return supabase
-          .from('leads')
-          .update(payload)
-          .eq('id', initial.id)
-          .select('*')
-          .single();
-      }
-      return supabase.from('leads').insert(payload).select('*').single();
+      const query = initial?.id
+        ? supabase
+            .from('leads')
+            .update(payload)
+            .eq('id', initial.id)
+            .select('*')
+        : supabase.from('leads').insert(payload).select('*');
+      const { data: rows, error } = await query;
+      return { data: (rows as Lead[] | null)?.[0] ?? null, error };
     };
 
     ({ data, error } = await attempt({ ...base, ...optional }));
@@ -86,13 +82,14 @@ export default function LeadModal({
     if (error) {
       console.error(error);
       onError(error.message);
-      return;
     }
-    onSaved(data as Lead);
+
+    const fallback = { ...(initial ?? {}), ...base, ...optional } as Lead;
+    onSaved((data as Lead) ?? fallback);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-4 w-full max-w-lg space-y-3">
         <div className="text-lg font-semibold">{initial ? 'Редактировать лид' : 'Добавить лид'}</div>
         <div className="grid grid-cols-2 gap-3">
