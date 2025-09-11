@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Client, AttendanceRecord } from '../lib/types';
 import {
@@ -137,62 +137,68 @@ export default function AttendancePage() {
                 {d}
               </button>
               {openDistricts[d] && (
-                <div className="p-4 space-y-4 overflow-x-auto">
+                <div className="p-4 overflow-x-auto">
                   {loading[d] && (
                     <div className="text-sm text-gray-500">загрузка…</div>
                   )}
-                  {!loading[d] &&
-                    (groups[d] || []).map((g) => (
-                      <div key={g.id} className="space-y-2">
-                        <div className="font-semibold">{g.age_band}</div>
-                        <div className="overflow-x-auto">
-                          <table className="min-w-full text-sm">
-                            <thead>
-                              <tr>
-                                <th className="px-2 py-1 text-left">ФИО</th>
-                                {dates.map((dt) => (
-                                  <th key={dt} className="px-2 py-1 text-center">
-                                    {new Date(dt).getDate()}
-                                  </th>
-                                ))}
+                  {!loading[d] && (
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr>
+                          <th className="px-2 py-1 text-left">ФИО</th>
+                          {dates.map((dt) => (
+                            <th key={dt} className="px-2 py-1 text-center">
+                              {new Date(dt).getDate()}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(groups[d] || []).map((g) => (
+                          <Fragment key={g.id}>
+                            <tr>
+                              <td
+                                colSpan={dates.length + 1}
+                                className="font-semibold pt-2"
+                              >
+                                {g.age_band}
+                              </td>
+                            </tr>
+                            {g.clients.map((c) => (
+                              <tr key={c.id} className="border-t">
+                                <td className="px-2 py-1">
+                                  {c.first_name}
+                                  {c.last_name ? ` ${c.last_name}` : ''}
+                                </td>
+                                {dates.map((dt) => {
+                                  const key = `${c.id}-${dt}`;
+                                  return (
+                                    <td key={dt} className="px-2 py-1 text-center">
+                                      <input
+                                        type="checkbox"
+                                        checked={!!records[key]}
+                                        onChange={() => toggle(c.id, dt)}
+                                      />
+                                    </td>
+                                  );
+                                })}
                               </tr>
-                            </thead>
-                            <tbody>
-                              {g.clients.map((c) => (
-                                <tr key={c.id} className="border-t">
-                                  <td className="px-2 py-1">
-                                    {c.first_name}
-                                    {c.last_name ? ` ${c.last_name}` : ''}
-                                  </td>
-                                  {dates.map((dt) => {
-                                    const key = `${c.id}-${dt}`;
-                                    return (
-                                      <td key={dt} className="px-2 py-1 text-center">
-                                        <input
-                                          type="checkbox"
-                                          checked={!!records[key]}
-                                          onChange={() => toggle(c.id, dt)}
-                                        />
-                                      </td>
-                                    );
-                                  })}
-                                </tr>
-                              ))}
-                              {g.clients.length === 0 && (
-                                <tr>
-                                  <td
-                                    className="px-2 py-1 text-sm text-gray-500"
-                                    colSpan={dates.length + 1}
-                                  >
-                                    Клиентов нет
-                                  </td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    ))}
+                            ))}
+                            {g.clients.length === 0 && (
+                              <tr>
+                                <td
+                                  className="px-2 py-1 text-sm text-gray-500"
+                                  colSpan={dates.length + 1}
+                                >
+                                  Клиентов нет
+                                </td>
+                              </tr>
+                            )}
+                          </Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               )}
             </div>
