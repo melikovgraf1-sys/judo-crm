@@ -7,7 +7,6 @@ import { DISTRICT_OPTIONS } from '../lib/districts';
 type Group = {
   id: string;
   age_band: string;
-  schedule?: string | null;
 };
 
 type GroupData = Group & { clients: Client[] };
@@ -50,10 +49,9 @@ export default function AttendancePage() {
     setLoading((p) => ({ ...p, [district]: true }));
     const { data: groupData, error } = await supabase
       .from('groups')
-      .select('id, age_band, schedule')
+      .select('id, age_band')
       .eq('district', district)
       .order('age_band', { ascending: true })
-      .order('schedule', { ascending: true })
       .returns<Group[]>();
 
     if (!error && groupData) {
@@ -117,10 +115,7 @@ export default function AttendancePage() {
                 {!loading[d] &&
                   (groups[d] || []).map((g) => (
                     <div key={g.id} className="space-y-2">
-                      <div className="font-semibold">
-                        {g.age_band}
-                        {g.schedule ? ` • ${g.schedule}` : ''}
-                      </div>
+                      <div className="font-semibold">{g.age_band}</div>
                       <div className="pl-4 space-y-1">
                         {g.clients.map((c) => (
                           <label key={c.id} className="flex items-center gap-2">
