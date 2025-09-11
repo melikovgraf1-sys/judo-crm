@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-// When running in Node (e.g. Vitest), ensure `.env` is loaded.
-// `@next/env` relies on the `fs` module, so we only require it on the server.
-if (typeof window === 'undefined') {
+// Load environment variables during tests only. When building for the browser,
+// this conditional evaluates to `false` at compile time so `@next/env` and its
+// `fs` dependency are not bundled, avoiding build-time errors.
+if (process.env.NODE_ENV === 'test') {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   require('@next/env').loadEnvConfig(process.cwd());
 }
