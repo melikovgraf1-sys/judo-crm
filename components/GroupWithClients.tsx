@@ -15,8 +15,7 @@ export default function GroupWithClients({ group, onChanged, districts }: Props)
   const [open, setOpen] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
-  const [openClient, setOpenClient] = useState(false);
-  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [clientModal, setClientModal] = useState<Partial<Client> | null>(null);
 
   async function toggle() {
     if (!open && clients.length === 0) {
@@ -40,7 +39,7 @@ export default function GroupWithClients({ group, onChanged, districts }: Props)
         group={group}
         onChanged={onChanged}
         districts={districts}
-        onAddClient={() => setOpenClient(true)}
+        onAddClient={() => setClientModal({ district: group.district as District })}
       />
       <button
         className="text-sm text-blue-600 underline"
@@ -57,8 +56,8 @@ export default function GroupWithClients({ group, onChanged, districts }: Props)
           {clients.map((c) => (
             <button
               key={c.id}
-              className="text-sm text-blue-600 underline"
-              onClick={() => { setEditingClient(c); setOpenClient(true); }}
+              className="text-sm text-left underline"
+              onClick={() => setClientModal(c)}
             >
               {c.first_name}
               {c.last_name ? ` ${c.last_name}` : ''}
@@ -66,12 +65,25 @@ export default function GroupWithClients({ group, onChanged, districts }: Props)
           ))}
         </div>
       )}
-      {openClient && (
+      {clientModal && (
         <ClientModal
-          initial={{ district: group.district as District }}
-          onClose={() => setOpenClient(false)}
-          onSaved={(c) => { if (c) setClients((prev) => [...prev, c]); setOpenClient(false); }}
-          groupId={group.id}
+          initial={clientModal}
+          onClose={() => setClientModal(null)}
+          onSaved={(c) => {
+            if (c) {
+              setClients((prev) => {
+                const idx = prev.findIndex((p) => p.id === c.id);
+                if (idx >= 0) {
+                  const next = [...prev];
+                  next[idx] = c;
+                  return next;
+                }
+                return [...prev, c];
+              });
+            }
+            setClientModal(null);
+          }}
+          groupId={clientModal && 'id' in clientModal ? undefined : group.id}
           districts={districts}
         />
       )}
