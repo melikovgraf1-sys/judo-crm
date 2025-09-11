@@ -9,22 +9,43 @@ create table if not exists public.attendance (
 -- Enable RLS and allow public CRUD operations
 alter table public.attendance enable row level security;
 
-create policy "Public read attendance" on public.attendance
-for select
-using (true);
+do $$
+begin
+  create policy "Public read attendance" on public.attendance
+    for select
+    using (true);
+exception
+  when duplicate_object then null;
+end $$;
 
-create policy "Public upsert attendance" on public.attendance
-for insert
-with check (true);
+do $$
+begin
+  create policy "Public upsert attendance" on public.attendance
+    for insert
+    with check (true);
+exception
+  when duplicate_object then null;
+end $$;
 
-create policy "Public update attendance" on public.attendance
-for update
-using (true)
-with check (true);
+do $$
+begin
+  create policy "Public update attendance" on public.attendance
+    for update
+    using (true)
+    with check (true);
+exception
+  when duplicate_object then null;
+end $$;
 
-create policy "Public delete attendance" on public.attendance
-for delete
-using (true);
+do $$
+begin
+  create policy "Public delete attendance" on public.attendance
+    for delete
+    using (true);
+exception
+  when duplicate_object then null;
+end $$;
+
 
 -- Refresh PostgREST schema cache so new table/columns are recognized
 notify pgrst, 'reload schema';
