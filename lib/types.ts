@@ -17,7 +17,6 @@ export type Client = {
 };
 
 export type AttendanceRecord = {
-  id: string;
   client_id: string;
   date: string;
   present: boolean;
