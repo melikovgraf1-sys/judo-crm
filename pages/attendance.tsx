@@ -2,16 +2,14 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Client, AttendanceRecord } from '../lib/types';
+import { DISTRICT_OPTIONS } from '../lib/districts';
 
 type Group = {
   id: string;
   age_band: string;
-  schedule?: string | null;
 };
 
 type GroupData = Group & { clients: Client[] };
-
-const DISTRICTS = ['Центр', 'Джикджилли', 'Махмутлар'];
 
 export default function AttendancePage() {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -49,22 +47,30 @@ export default function AttendancePage() {
 
   async function loadDistrict(district: string) {
     setLoading((p) => ({ ...p, [district]: true }));
-    const { data, error } = await supabase
+    const { data: groupData, error } = await supabase
       .from('groups')
-      .select(
-        'id, age_band, schedule, client_groups(client:clients(id, first_name, last_name))'
-      )
+      .select('id, age_band')
       .eq('district', district)
       .order('age_band', { ascending: true })
-      .order('schedule', { ascending: true })
-      .returns<(Group & { client_groups: { client: Client }[] })[]>();
+      .returns<Group[]>();
 
-    if (!error && data) {
-      const result: GroupData[] = data.map((g) => ({
-        id: g.id,
-        age_band: g.age_band,
-        schedule: g.schedule,
-        clients: (g.client_groups || []).map((cg) => cg.client),
+    if (!error && groupData) {
+      const ids = groupData.map((g) => g.id);
+      const { data: clientData } = await supabase
+        .from('client_groups')
+        .select('group_id, client:clients(id, first_name, last_name)')
+        .in('group_id', ids.length ? ids : ['-'])
+        .returns<{ group_id: string; client: Client }[]>();
+
+      const clientMap: Record<string, Client[]> = {};
+      (clientData || []).forEach((cg) => {
+        if (!clientMap[cg.group_id]) clientMap[cg.group_id] = [];
+        clientMap[cg.group_id].push(cg.client);
+      });
+
+      const result: GroupData[] = groupData.map((g) => ({
+        ...g,
+        clients: clientMap[g.id] || [],
       }));
       setGroups((p) => ({ ...p, [district]: result }));
     } else {
@@ -93,7 +99,7 @@ export default function AttendancePage() {
         />
       </div>
       <div className="space-y-4">
-        {DISTRICTS.map((d) => (
+        {DISTRICT_OPTIONS.map((d) => (
           <div key={d} className="border rounded-xl bg-white/70 shadow">
             <button
               className="w-full text-left px-4 py-2 font-semibold"
@@ -109,10 +115,7 @@ export default function AttendancePage() {
                 {!loading[d] &&
                   (groups[d] || []).map((g) => (
                     <div key={g.id} className="space-y-2">
-                      <div className="font-semibold">
-                        {g.age_band}
-                        {g.schedule ? ` • ${g.schedule}` : ''}
-                      </div>
+                      <div className="font-semibold">{g.age_band}</div>
                       <div className="pl-4 space-y-1">
                         {g.clients.map((c) => (
                           <label key={c.id} className="flex items-center gap-2">
