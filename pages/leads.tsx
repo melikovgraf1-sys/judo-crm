@@ -77,7 +77,7 @@ export default function LeadsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Лиды</h1>
-      <div className="mb-4 relative z-10">
+      <div className="mb-4 relative z-20 pointer-events-auto">
         <button
           type="button"
           onClick={openAdd}
@@ -88,7 +88,7 @@ export default function LeadsPage() {
       </div>
       {errorMsg && <div className="text-red-600 mb-2">{errorMsg}</div>}
       {loading && <div className="text-gray-500">Загрузка…</div>}
-      <div className="flex gap-4 overflow-x-auto">
+      <div className="flex gap-4 overflow-x-auto relative z-0">
         {LEAD_STAGES.map((stage) => (
           <div
             key={stage.key}
