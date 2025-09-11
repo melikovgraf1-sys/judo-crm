@@ -68,24 +68,10 @@ export default function GroupWithClients({ group, onChanged, districts }: Props)
       )}
       {openClient && (
         <ClientModal
-          initial={editingClient ?? { district: group.district }}
-          onClose={() => { setOpenClient(false); setEditingClient(null); }}
-          onSaved={(c) => {
-            setOpenClient(false);
-            setEditingClient(null);
-            if (c) {
-              setClients((prev) => {
-                const idx = prev.findIndex((p) => p.id === c.id);
-                if (idx >= 0) {
-                  const copy = [...prev];
-                  copy[idx] = c;
-                  return copy;
-                }
-                return [...prev, c];
-              });
-            }
-          }}
-          groupId={editingClient ? undefined : group.id}
+          initial={{ district: group.district as District }}
+          onClose={() => setOpenClient(false)}
+          onSaved={(c) => { if (c) setClients((prev) => [...prev, c]); setOpenClient(false); }}
+          groupId={group.id}
           districts={districts}
         />
       )}
