@@ -74,6 +74,7 @@ export default function LeadsPage() {
     setOpenModal(true);
   };
 
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Лиды</h1>
@@ -112,7 +113,7 @@ export default function LeadsPage() {
           </div>
         ))}
       </div>
-      {openModal && (
+      {editing && (
         <LeadModal
           initial={editing}
           onClose={() => {
