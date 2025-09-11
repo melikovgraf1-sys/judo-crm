@@ -104,14 +104,14 @@ export default function LeadsPage() {
       .from('leads')
       .insert({ ...base, ...optional })
       .select('*')
-      .single());
+      .maybeSingle());
 
     if (error && /column/.test(error.message)) {
       ({ data, error } = await supabase
         .from('leads')
         .insert(base)
         .select('*')
-        .single());
+        .maybeSingle());
     }
 
     if (error) {

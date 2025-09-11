@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import GroupCard, { Group } from './GroupCard';
-import type { Client } from '../lib/types';
+import type { Client, District } from '../lib/types';
 import ClientModal from './ClientModal';
 
 type Props = {
