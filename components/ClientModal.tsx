@@ -56,14 +56,21 @@ export default function ClientModal({
     };
 
     let error;
-    let data;
+    let data: Client | null = null;
     if (initial?.id) {
       ({ error } = await supabase
         .from('clients')
         .update(basePayload)
         .eq('id', initial.id));
+      if (!error) {
+        data = { ...(initial as Client), ...basePayload } as Client;
+      }
     } else {
-      ({ data, error } = await supabase.from('clients').insert(basePayload).select().single());
+      ({ data, error } = await supabase
+        .from('clients')
+        .insert(basePayload)
+        .select()
+        .single());
       if (!error && groupId && data) {
         const { error: cgError } = await supabase
           .from('client_groups')
@@ -72,7 +79,7 @@ export default function ClientModal({
       }
     }
     if (error) { setToast(error.message); return; }
-    onSaved(data as Client | undefined);
+    onSaved(data ?? undefined);
   };
 
   return (
@@ -84,66 +91,119 @@ export default function ClientModal({
           {initial ? 'Редактировать клиента' : 'Добавить клиента'}
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <input className="border rounded p-2 col-span-1" placeholder="Имя"
-                 value={form.first_name ?? ''} onChange={e => set('first_name', e.target.value)} />
-          <input className="border rounded p-2 col-span-1" placeholder="Фамилия"
-                 value={form.last_name ?? ''} onChange={e => set('last_name', e.target.value)} />
-          <input className="border rounded p-2 col-span-1" placeholder="Телефон"
-                 value={form.phone ?? ''} onChange={e => set('phone', e.target.value)} />
-          <select className="border rounded p-2 col-span-1" value={form.channel ?? ''} onChange={e => set('channel', e.target.value || null)}>
-            <option value="">Канал</option>
-            <option value="whatsapp">WhatsApp</option>
-            <option value="telegram">Telegram</option>
-            <option value="instagram">Instagram</option>
-          </select>
-          <input
-            type="date"
-            className="border rounded p-2 col-span-1"
-            placeholder="Дата рождения"
-            aria-label="Дата рождения"
-            value={form.birth_date ?? ''}
-            onChange={e => set('birth_date', e.target.value)}
-          />
-          <input
-            className="border rounded p-2 col-span-1"
-            placeholder="Родитель"
-            value={form.parent_name ?? ''}
-            onChange={e => set('parent_name', e.target.value)}
-          />
-          <input
-            type="date"
-            className="border rounded p-2 col-span-1"
-            placeholder="Начало посещения"
-            aria-label="Начало посещения"
-            value={form.start_date ?? ''}
-            onChange={e => set('start_date', e.target.value)}
-          />
-          <select className="border rounded p-2 col-span-1" value={form.gender ?? ''} onChange={e => set('gender', e.target.value || null)}>
-            <option value="">Пол</option>
-            <option value="m">М</option>
-            <option value="f">Ж</option>
-          </select>
-          <select className="border rounded p-2 col-span-1" value={form.payment_status ?? ''} onChange={e => set('payment_status', e.target.value || null)}>
-            <option value="">Статус оплаты</option>
-            <option value="pending">Ожидает</option>
-            <option value="active">Активен</option>
-            <option value="debt">Долг</option>
-          </select>
-          <select className="border rounded p-2 col-span-1" value={form.payment_method ?? ''} onChange={e => set('payment_method', e.target.value || null)}>
-            <option value="">Способ оплаты</option>
-            <option value="cash">Нал</option>
-            <option value="transfer">Перевод</option>
-          </select>
-          <select
-            className="border rounded p-2 col-span-2"
-            value={form.district ?? ''}
-            onChange={e => set('district', e.target.value || null)}
-          >
-            <option value="">Район</option>
-            {districts.map((d) => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
+          <label className="col-span-1 flex flex-col gap-1">
+            <span className="text-sm">Имя</span>
+            <input
+              className="border rounded p-2"
+              value={form.first_name ?? ''}
+              onChange={e => set('first_name', e.target.value)}
+            />
+          </label>
+          <label className="col-span-1 flex flex-col gap-1">
+            <span className="text-sm">Фамилия</span>
+            <input
+              className="border rounded p-2"
+              value={form.last_name ?? ''}
+              onChange={e => set('last_name', e.target.value)}
+            />
+          </label>
+          <label className="col-span-1 flex flex-col gap-1">
+            <span className="text-sm">Телефон</span>
+            <input
+              className="border rounded p-2"
+              value={form.phone ?? ''}
+              onChange={e => set('phone', e.target.value)}
+            />
+          </label>
+          <label className="col-span-1 flex flex-col gap-1">
+            <span className="text-sm">Канал</span>
+            <select
+              className="border rounded p-2"
+              value={form.channel ?? ''}
+              onChange={e => set('channel', e.target.value || null)}
+            >
+              <option value="">Не выбрано</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="telegram">Telegram</option>
+              <option value="instagram">Instagram</option>
+            </select>
+          </label>
+          <label className="col-span-1 flex flex-col gap-1">
+            <span className="text-sm">Дата рождения</span>
+            <input
+              type="date"
+              className="border rounded p-2"
+              value={form.birth_date ?? ''}
+              onChange={e => set('birth_date', e.target.value)}
+            />
+          </label>
+          <label className="col-span-1 flex flex-col gap-1">
+            <span className="text-sm">Родитель</span>
+            <input
+              className="border rounded p-2"
+              value={form.parent_name ?? ''}
+              onChange={e => set('parent_name', e.target.value)}
+            />
+          </label>
+          <label className="col-span-1 flex flex-col gap-1">
+            <span className="text-sm">Начало посещения</span>
+            <input
+              type="date"
+              className="border rounded p-2"
+              value={form.start_date ?? ''}
+              onChange={e => set('start_date', e.target.value)}
+            />
+          </label>
+          <label className="col-span-1 flex flex-col gap-1">
+            <span className="text-sm">Пол</span>
+            <select
+              className="border rounded p-2"
+              value={form.gender ?? ''}
+              onChange={e => set('gender', e.target.value || null)}
+            >
+              <option value="">Не выбрано</option>
+              <option value="m">М</option>
+              <option value="f">Ж</option>
+            </select>
+          </label>
+          <label className="col-span-1 flex flex-col gap-1">
+            <span className="text-sm">Статус оплаты</span>
+            <select
+              className="border rounded p-2"
+              value={form.payment_status ?? ''}
+              onChange={e => set('payment_status', e.target.value || null)}
+            >
+              <option value="">Не выбрано</option>
+              <option value="pending">Ожидает</option>
+              <option value="active">Активен</option>
+              <option value="debt">Долг</option>
+            </select>
+          </label>
+          <label className="col-span-1 flex flex-col gap-1">
+            <span className="text-sm">Способ оплаты</span>
+            <select
+              className="border rounded p-2"
+              value={form.payment_method ?? ''}
+              onChange={e => set('payment_method', e.target.value || null)}
+            >
+              <option value="">Не выбрано</option>
+              <option value="cash">Нал</option>
+              <option value="transfer">Перевод</option>
+            </select>
+          </label>
+          <label className="col-span-2 flex flex-col gap-1">
+            <span className="text-sm">Район</span>
+            <select
+              className="border rounded p-2"
+              value={form.district ?? ''}
+              onChange={e => set('district', e.target.value || null)}
+            >
+              <option value="">Не выбрано</option>
+              {districts.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          </label>
         </div>
         <div className="flex justify-end gap-2">
           <button className="px-3 py-2 rounded bg-gray-200" onClick={onClose}>Отмена</button>
