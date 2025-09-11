@@ -74,7 +74,6 @@ export default function LeadsPage() {
     setOpenModal(true);
   };
 
-
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Лиды</h1>
@@ -123,6 +122,11 @@ export default function LeadsPage() {
           onSaved={(lead) => {
             setOpenModal(false);
             setEditing(null);
+            if (!lead.id) {
+              loadData();
+              return;
+            }
+
             setLeads((prev) => {
               const updated: StageMap = emptyStageMap();
               for (const s of LEAD_STAGES) {
